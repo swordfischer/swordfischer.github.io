@@ -223,7 +223,7 @@ Date:   Tue Nov 28 09:15:34 2023 +0000
 
 Well, look at that, `bytesparkle` made a commit message mentioning they removed some credentials. Let's check the change they did.
 
-{% highlight bash %}
+{% highlight diff %}
 OpTinselTrace-2/papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts$ git diff a92e975c8c52221d5c1c371d5595f65eb13f8be5 5d24a8f411fc931b54fb9a4b58b6b55f1016c34d
 diff --git a/claus.py b/claus.py
 index 38938fa..6ee67e3 100644
