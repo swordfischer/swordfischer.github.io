@@ -128,7 +128,7 @@ We can click the line with `FSDELETE`, then Wireshark will mark the packet in th
 
 ![Conversations 71](/img/htb/sherlock/optinseltrace-4/conversations_stream_71_fsdeleteTS.png)
 
-If you have a sequnce number or anything else, you can modify the information in the columns by alternate clicking the column, go to `Column Preferences` then select the `Time` column and change the type to `UTC date, as YYYY-MM-DD, and time`
+If you have a sequence number or anything else in the time column, you can modify the information in the columns by alternate clicking the column, go to `Column Preferences` then select the `Time` column and change the type to `UTC date, as YYYY-MM-DD, and time`
 
 | **Answer for #10** | `2023-12-08 12:18:14` |
 
