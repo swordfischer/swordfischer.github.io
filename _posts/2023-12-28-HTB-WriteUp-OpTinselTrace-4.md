@@ -42,13 +42,13 @@ It's evident that `172.17.79.133` is doing a port scan, but let's check the conv
 
 ![Conversations](/img/htb/sherlock/optinseltrace-4/conversations.png)
 
-| **Answer for #1** | `172.17.79.133` |
+{% include htb_flag.html id="1" description="The performance of the network printer server has become sluggish, causing interruptions in the workflow at the North Pole workshop. Santa has directed us to generate a support request and examine the network data to pinpoint the source of the issue. He suspects that the Grinch and his group may be involved in this situation. Could you verify if there is an IP Address that is sending an excessive amount of traffic to the printer server?" flag="172.17.79.133" %}
 
 ### 2. Bytesparkle being the technical Lead, found traces of port scanning from the same IP identified in previous attack. Which port was then targeted for initial compromise of the printer?
 
 By using the conversation information from earlier, combined with information from the portscan, we can see that `tcp/9100` is where most of the data exchange happens. This is also a port used for network communication with printers, such as HP JetDirect or PDL. Safe to say, we know which port the TA is communicating with the printer on.
 
-| **Answer for #2** | `9100` |
+{% include htb_flag.html id="2" description="Bytesparkle being the technical Lead, found traces of port scanning from the same IP identified in previous attack. Which port was then targeted for initial compromise of the printer?" flag="9100" %}
 
 ### 3. What is the full name of printer running on the server?
 
@@ -66,7 +66,7 @@ Here, we see a PJL (Printer Job Language) query `@PJL INFO ID`, where our answer
 
 {% include htb_challenge.html content="If you would like to be on the red side of such a challenge, I can recommend <a href='https://app.hackthebox.com/challenges/gawk' style='color: #ffaf00'>Gawk</a>" %}
 
-| **Answer for #3** | `Northpole HP LaserJet 4200n` |
+{% include htb_flag.html id="3" description="What is the full name of printer running on the server?" flag="Northpole HP LaserJet 4200n" %}
 
 ### 4. Grinch intercepted a list of nice and naughty children created by Santa. What was name of the second child on the nice list?
 
@@ -74,14 +74,14 @@ If we continue down the same conversation, we find a query `@PJL FSUPLOAD FORMAT
 
 ![Conversations 28](/img/htb/sherlock/optinseltrace-4/conversations_stream_28_nice.png)
 
-| **Answer for #4** | `Douglas Price` |
+{% include htb_flag.html id="4" description="Grinch intercepted a list of nice and naughty children created by Santa. What was name of the second child on the nice list?" flag="Douglas Price" %}
 
 ### 5. The Grinch obtained a print job instruction file intended for a printer used by an employee named Elfin. It appears that Santa and the North Pole management team have made the decision to dismiss Elfin. Could you please provide the word for word rationale behind the decision to terminate Elfin's employment?
 
 We'll read further and discover a layoff notice `@PJL FSUPLOAD FORMAT:BINARY NAME="0:/saveDevice/SavedJobs/InProgress/Layoff-notice/Personal-Notice-Employee43.pcl" OFFSET=0 SIZE=696`. It contains the message we need to answer with, after `Reason for layoff : `.
 ![Conversations 28](/img/htb/sherlock/optinseltrace-4/conversations_stream_28_layoff.png)
 
-| **Answer for #5** | `The addressed employee is confirmed to be working with grinch and team. According to Clause 69 , This calls for an immediate expulsion.` |
+{% include htb_flag.html id="5" description="The Grinch obtained a print job instruction file intended for a printer used by an employee named Elfin. It appears that Santa and the North Pole management team have made the decision to dismiss Elfin. Could you please provide the word for word rationale behind the decision to terminate Elfin's employment?" flag="The addressed employee is confirmed to be working with grinch and team. According to Clause 69 , This calls for an immediate expulsion." %}
 
 ### 6. What was the name of the scheduled print job?
 This threw me off a bit, as I thought it was referencing the previous print job. In any case, we had to check some of the other streams and if they had a `ScheduledJobs` section.
@@ -90,7 +90,7 @@ This threw me off a bit, as I thought it was referencing the previous print job.
 
 Seems like getting rid of Elfin may be a joyous thing for the other elfs. Either way, the answer is the `@PJL JOB NAME`.
 
-| **Answer for #6** | `MerryChristmas+BonusAnnouncment` |
+{% include htb_flag.html id="6" description="What was the name of the scheduled print job?" flag="MerryChristmas+BonusAnnouncment" %}
 
 ### 7. Amidst our ongoing analysis of the current packet capture, the situation has escalated alarmingly. Our security system has detected signs of post-exploitation activities on a highly critical server, which was supposed to be secure with SSH key-only access. This development has raised serious concerns within the security team. While Bytesparkle is investigating the breach, he speculated that this security incident might be connected to the earlier printer issue. Could you determine and provide the complete path of the file on the printer server that enabled the Grinch to laterally move to this critical server?
 
@@ -102,13 +102,13 @@ If you want to read some documentation on the PJL, you can read [this](https://d
 
 The `0:` describes the Volume, and the text following that is the path - which is what we need to input as an answer.
 
-| **Answer for #7** | `/Administration/securitykeys/ssh_systems/id_rsa` |
+{% include htb_flag.html id="7" description="Amidst our ongoing analysis of the current packet capture, the situation has escalated alarmingly. Our security system has detected signs of post-exploitation activities on a highly critical server, which was supposed to be secure with SSH key-only access. This development has raised serious concerns within the security team. While Bytesparkle is investigating the breach, he speculated that this security incident might be connected to the earlier printer issue. Could you determine and provide the complete path of the file on the printer server that enabled the Grinch to laterally move to this critical server?" flag="/Administration/securitykeys/ssh_systems/id_rsa" %}
 
 ### 8. What is size of this file in bytes?
 
 This is more or less answered a couple of times in the previous screenshot, but `@PJL FSDIRLIST NAME="0:/Administration/securitykeys/ssh_systems" ENTRY=1` returns a single file named `id_rsa`, to which the `SIZE=` is the answer.
 
-| **Answer for #8** | `1914` |
+{% include htb_flag.html id="8" description="What is size of this file in bytes?" flag="1914" %}
 
 ### 9. What was the hostname of the other compromised critical server?
 
@@ -116,7 +116,7 @@ Not only are they storing private keys on their printer, they are also adding a 
 
 `PJL FSUPLOAD FORMAT:BINARY NAME="0:/Administration/securitykeys/ssh_systems/id_rsa" OFFSET=0 SIZE=1914` then the following line contains our answer.
 
-| **Answer for #9** | `christmas.gifts` |
+{% include htb_flag.html id="9" description="What was the hostname of the other compromised critical server?" flag="christmas.gifts" %}
 
 ### 10. When did the Grinch attempt to delete a file from the printer? (UTC)
 
@@ -130,7 +130,7 @@ We can click the line with `FSDELETE`, then Wireshark will mark the packet in th
 
 If you have a sequence number or anything else in the time column, you can modify the information in the columns by alternate clicking the column, go to `Column Preferences` then select the `Time` column and change the type to `UTC date, as YYYY-MM-DD, and time`
 
-| **Answer for #10** | `2023-12-08 12:18:14` |
+{% include htb_flag.html id="10" description="When did the Grinch attempt to delete a file from the printer? (UTC)" flag="2023-12-08 12:18:14" %}
 
 ## Congratulations
 

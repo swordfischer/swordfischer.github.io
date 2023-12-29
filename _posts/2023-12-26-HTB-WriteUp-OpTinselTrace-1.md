@@ -47,7 +47,7 @@ If we check the `C:\Users\Elfin\AppData\Roaming` directory we find a `eM Client`
 
 While browsing the directory, we also stumble upon the `C:\Users\Elfin\AppData\Roaming\top-secret` directory, and likely related to the keywords we are looking for - this is very interesting, so lets make a note of that and come back to that later.
 
-| **Answer for #1** | `eM Client` |
+{% include htb_flag.html id="1" description="What is the name of the email client that Elfin is using?" flag="eM Client" %}
 
 ### 2. What is the email the threat is using?
 
@@ -63,7 +63,7 @@ Upon further inspection, we can find some mail correspondance with someone named
 
 ![eM Client](/img/htb/sherlock/optinseltrace-1/emclient_2.png)
 
-| **Answer for #2** | `definitelynotthegrinch@gmail.com` |
+{% include htb_flag.html id="2" description="What is the email the threat is using?" flag="definitelynotthegrinch@gmail.com" %}
 
 ### 3. When does the threat actor reach out to Elfin?
 
@@ -74,7 +74,7 @@ At least it seems like an initial dialogue, coming from the Grinch posing as Wen
 
 Keep in mind that timestamps are always submitted as UTC, and your operating system may have an offset - in this case, it does not.
 
-| **Answer for #3** | `2023-11-27 17:27:26` |
+{% include htb_flag.html id="3" description="When does the threat actor reach out to Elfin?" flag="2023-11-27 17:27:26" %}
 
 ### 4. What is the name of Elfins boss?
 
@@ -82,7 +82,7 @@ If we look at the conversation occuring after the first conversation with the Gr
 
 ![eM Client](/img/htb/sherlock/optinseltrace-1/emclient_4.png)
 
-| **Answer for #4** | `elfuttin bigelf` |
+{% include htb_flag.html id="4" description="What is the name of Elfins boss?" flag="elfuttin bigelf" %}
 
 ### 5. What is the title of the email in which Elfin first mentions his access to Santas special files?
 
@@ -94,7 +94,7 @@ But we might need to check if the client removes information such as replies, fo
 
 ![eM Client](/img/htb/sherlock/optinseltrace-1/emclient_6.png)
 
-| **Answer for #5** | `Re: work` |
+{% include htb_flag.html id="5" description="What is the title of the email in which Elfin first mentions his access to Santas special files?" flag="Re: work" %}
 
 ### 6. The threat actor changes their name, what is the new name + the date of the first email Elfin receives with it?
 
@@ -104,7 +104,7 @@ If we view it, we also see that Elfin notices the name change.
 
 ![eM Client](/img/htb/sherlock/optinseltrace-1/emclient_7.png)
 
-| **Answer for #6** | `wendy elflower, 2023-11-28 10:00:21` |
+{% include htb_flag.html id="6" description="The threat actor changes their name, what is the new name + the date of the first email Elfin receives with it?" flag="wendy elflower, 2023-11-28 10:00:21" %}
 
 ### 7. What is the name of the bar that Elfin offers to meet the threat actor at?
 
@@ -112,7 +112,7 @@ Viewing the same conversation, we can see a reference to a bar.
 
 ![eM Client](/img/htb/sherlock/optinseltrace-1/emclient_8.png)
 
-| **Answer for #7** | `SnowGlobe` |
+{% include htb_flag.html id="7" description="What is the name of the bar that Elfin offers to meet the threat actor at?" flag="SnowGlobe" %}
 
 ### 8. When does Elfin offer to send the secret files to the actor?
 
@@ -122,7 +122,7 @@ Timezones are never a fun thing - but we are only missing the seconds to get our
 
 ![eM Client](/img/htb/sherlock/optinseltrace-1/emclient_9.png)
 
-| **Answer for #8** | `2023-11-28 16:56:13` |
+{% include htb_flag.html id="8" description="When does Elfin offer to send the secret files to the actor?" flag="2023-11-28 16:56:13" %}
 
 ### 9. What is the search string for the first suspicious google search from Elfin? (Format: string)
 
@@ -135,7 +135,7 @@ Chrome has a neat little about page for searches called `chrome://history/`. If 
 
 ![eM Client](/img/htb/sherlock/optinseltrace-1/emclient_10.png)
 
-| **Answer for #9** | `how to get around work security` | 
+{% include htb_flag.html id="9" description="What is the search string for the first suspicious google search from Elfin? (Format: string)" flag="how to get around work security" %}
 
 ### 10. What is the name of the author who wrote the article from the CIA field manual?
 
@@ -146,7 +146,7 @@ Let's check the history in Chrome again, there is a history item for the CIA fie
 We'll open the link
 ![eM Client](/img/htb/sherlock/optinseltrace-1/emclient_12.png)
 
-| **Answer for #10** | `Joost Minnaar` |
+{% include htb_flag.html id="10" description="What is the name of the author who wrote the article from the CIA field manual?" flag="Joost Minnaar" %}
 
 ### 11. What is the name of Santas secret file that Elfin sent to the actor?
 
@@ -159,7 +159,7 @@ or
 
 Either way
 
-| **Answer for #11** | `santa_deliveries.zip` |
+{% include htb_flag.html id="11" description="What is the name of Santas secret file that Elfin sent to the actor?" flag="santa_deliveries.zip" %}
 
 ### 12. According to the filesystem, what is the exact CreationTime of the secret file on Elfins host?
 
@@ -168,7 +168,7 @@ Now we can pull some information from the master file table or the `$MFT`. This 
 MFTExplorer can take some time to load up depending on the size of the `$MFT`, and MFTCmd can dump a list of files into a csv we can view.
 
 {% highlight powershell %}
-PS > & MFTECmd.exe -f "$MFT" --csv MFT
+MFTECmd.exe -f "$MFT" --csv MFT
 MFTECmd version 1.2.2.1
 
 .. TRUNCATED ...
@@ -181,7 +181,7 @@ Path to MFT doesn't exist. Creating...
 Once we have the CSV created, we can read the creation time of the file.
 
 {% highlight powershell %}
-PS > Import-Csv -Path MFT\20231226203702_MFTECmd_`$MFT_Output.csv | ? { $_.FileName -eq 'santa_deliveries.zip'}
+Import-Csv -Path MFT\20231226203702_MFTECmd_`$MFT_Output.csv | ? { $_.FileName -eq 'santa_deliveries.zip'}
 
 ... TRUNCATED ...
 
@@ -207,13 +207,13 @@ LastAccess0x30        : 2023-11-28 17.01.29.2753913
 
 The timestamp mentioned in `Created0x10` is the creation time we are looking for according to [Kroll](https://www.kroll.com/en/insights/publications/cyber/anti-forensic-tactics/detecting-analyzing-timestomping-with-kape)
 
-| **Answer for #12** | `2023-11-28 17:01:29` |
+{% include htb_flag.html id="12" description="According to the filesystem, what is the exact CreationTime of the secret file on Elfins host?" flag="2023-11-28 17:01:29" %}
 
 ### 13. What is the full directory name that Elfin stored the file in?
 
 We have already found the files in #12 and #13, so there is no need to make this complicated.
 
-| **Answer for #13** | `C:\users\Elfin\Appdata\Roaming\top-secret` |
+{% include htb_flag.html id="13" description="What is the full directory name that Elfin stored the file in?" flag="C:\users\Elfin\Appdata\Roaming\top-secret" %}
 
 ### 14. Which country is Elfin trying to flee to after he exfiltrates the file?
 
@@ -223,7 +223,7 @@ In here, we see some searches that would relate to Elfins travel plans
 
 ![eM Client](/img/htb/sherlock/optinseltrace-1/emclient_15.png)
 
-| **Answer for #14** | `Greece` |
+{% include htb_flag.html id="14" description="Which country is Elfin trying to flee to after he exfiltrates the file?" flag="Greece" %}
 
 ### 15. What is the email address of the apology letter the user (elfin) wrote out but didn’t send?
 
@@ -231,7 +231,7 @@ Once again we head back into the email client, and look for something that is wr
 
 ![eM Client](/img/htb/sherlock/optinseltrace-1/emclient_16.png)
 
-| **Answer for #15** | `Santa.claus@gmail.com` |
+{% include htb_flag.html id="15" description="What is the email address of the apology letter the user (elfin) wrote out but didn’t send?" flag="Santa.claus@gmail.com" %}
 
 ### 16. The head elf PixelPeppermint has requested any passwords of Elfins to assist in the investigation down the line. What’s the windows password of Elfin’s host?
 
@@ -265,7 +265,7 @@ hashcat (v6.2.5) starting
 ... TRUNCATED ....
 {% endhighlight %}
 
-| **Answer for #5** | `Santaknowskungfu` |
+{% include htb_flag.html id="16" description="The head elf PixelPeppermint has requested any passwords of Elfins to assist in the investigation down the line. What’s the windows password of Elfin’s host?" flag="Santaknowskungfu" %}
 
 ## Congratulations
 

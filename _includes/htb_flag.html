@@ -1,9 +1,8 @@
-  <div style="
+<div style="
   background-color: #1A2332;
   border: 1px solid #1A2332;
   color: #FFF;
-  display: block;
-  margin-bottom: 2em;
+  margin: 2em 0;
   border-radius: 0.5em;
   display: flex;
 ">
@@ -20,7 +19,7 @@
         top: 50%;
         -ms-transform: translateY(-50%);
         -webkit-transform: translateY(-50%);
-        transform: translateY(-50%)"><img src="/img/htb/sherlock/{{ include.title | downcase }}/logo.png" height="64"></p>
+        transform: translateY(-50%)">{{ include.id }}</p>
 	</div>
 	<div style="
     padding: 0.25em 0.5em;
@@ -30,15 +29,15 @@
 		<p style="
         font-weight: 700;
         padding: 0 1em;
-        "><a href="https://app.hackthebox.com/sherlocks/{{ include.title }}">{{ include.title }}</a> | {{ include.difficulty }}</p>
+        ">{{ include.description }}</p>
 		<div>
 			<p style="
                 width: 90%;
-                color: #FFF;
+                color: #9FEF00;
                 margin: 0 1em 1em 1em;
                 padding: 1em;
                 background-color: #111927;
-                border: 1px solid #1A2332">{{ include.scenario }}</p>
+                border: 1px solid #1A2332">{{ include.flag }}</p>
 		</div>
 	</div>
 </div>

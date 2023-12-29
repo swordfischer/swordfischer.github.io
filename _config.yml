@@ -18,15 +18,20 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: swordfischer hacks stuff
-description: >- # this means to ignore newlines until "baseurl:"
-  a place for me to make my writeups from my ventures on various red, blue or purple sites
-baseurl: "/" # the subpath of your site, e.g. /blog
-url: "https://swordfischer.github.io" # the base hostname & protocol for your site, e.g. http://example.com
-github_username:  swordfischer
+title: "swordfischer.io"
+name: "swordfischer"
+description: >
+baseurl: "/"
+url: "https://swordfischer.github.io"
+github_username: "swordfischer"
 
 # Build settings
-theme: minima
+remote_theme: jekyll/minima
+#theme: minima
+
+minima:
+  skin: dark
+
 plugins:
   - jekyll-feed
 

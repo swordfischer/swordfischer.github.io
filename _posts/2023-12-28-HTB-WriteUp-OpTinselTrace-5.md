@@ -37,7 +37,7 @@ Let's start by analyzing the data in our KAPE directory. Most likely, the CVE wi
 I recently came to learn of [Hayabusa](https://github.com/Yamato-Security/hayabusa), so I'll be using that. We'll just pull all information and dump that into a CSV we can view with a tool like [TimelineExplorer](https://ericzimmerman.github.io/#!index.md).
 
 {% highlight powershell %}
-PS > hayabusa-2.10.1-win-x64.exe csv-timeline -d DC01.northpole.local-KAPE\uploads\auto\C%3A\Windows\System32\winevt -o OpTinselTrace5.csv
+hayabusa-2.10.1-win-x64.exe csv-timeline -d DC01.northpole.local-KAPE\uploads\auto\C%3A\Windows\System32\winevt -o OpTinselTrace5.csv
 
 ╔╗ ╔╦═══╦╗  ╔╦═══╦══╗╔╗ ╔╦═══╦═══╗
 ║║ ║║╔═╗║╚╗╔╝║╔═╗║╔╗║║║ ║║╔═╗║╔═╗║
@@ -84,7 +84,7 @@ Something that caught my eye, is that there is a Logon event for the DC, but com
 
 By now, I already have an inkling of what kind of attack we're seeing - but a few lines higher we get a confirmation as `Svc: vulnerable_to_zerologon` states the obvious. The attacker is using a privilege escalation vulnerability in Netlogon called Zerologon, which has the CVE we will use as our answer.
 
-| **Answer for #1** | `CVE-2020-1472` |
+{% include htb_flag.html id="1" description="Which CVE did the Threat Actor (TA) initially exploit to gain access to DC01?" flag="CVE-2020-1472" %}
 
 ### 2. What time did the TA initially exploit the CVE? (UTC)
 
@@ -92,14 +92,13 @@ We're still looking at the same sequence of events, and it shows the timestamp f
 
 ![Timeline Explorer](/img/htb/sherlock/optinseltrace-5/timeline_zerologon.png)
 
-
-| **Answer for #2** | `2023-12-13 09:24:23` |
+{% include htb_flag.html id="2" description="What time did the TA initially exploit the CVE? (UTC)" flag="2023-12-13 09:24:23" %}
 
 ### 3. What is the name of the executable related to the unusual service installed on the system around the time of the CVE exploitation?
 
 The installation of a service called `vulnerable_to_zerologon` shows the path to the executable, which is our answer.
 
-| **Answer for #3** | `hAvbdksT.exe` |
+{% include htb_flag.html id="3" description="What is the name of the executable related to the unusual service installed on the system around the time of the CVE exploitation?" flag="hAvbdksT.exe" %}
 
 ### 4. What date & time was the unusual service start?
 
@@ -108,8 +107,7 @@ Hayabusa did not collection this information, but luckily we can read the events
 This information is usually stored in the `System.evtx`.
 
 {% highlight powershell %}
-
-PS> Get-WinEvent -FilterHashtable @{ Path="DC01.northpole.local-KAPE\uploads\auto\C%3A\Windows\System32\winevt\Logs\System.evtx"; StartTime=(Get-Date "2023-12-13"); Id=7036 } -ea 0 | ? { $_.Message -match 'ZeroLogon'}
+Get-WinEvent -FilterHashtable @{ Path="DC01.northpole.local-KAPE\uploads\auto\C%3A\Windows\System32\winevt\Logs\System.evtx"; StartTime=(Get-Date "2023-12-13"); Id=7036 } -ea 0 | ? { $_.Message -match 'ZeroLogon'}
 
 
    ProviderName: Service Control Manager
@@ -124,7 +122,7 @@ TimeCreated                      Id LevelDisplayName Message
 So, the machine I'm reading from has local time of UTC+1, so we need to subtract one hour. We could also use the `.ToUniversalTime()` function on the `datetime` object.
 
 {% highlight powershell %}
-PS> Get-WinEvent -FilterHashtable @{ Path="DC01.northpole.local-KAPE\uploads\auto\C%3A\Windows\System32\winevt\Logs\System.evtx"; StartTime=(Get-Date "2023-12-13"); Id=7036 } -ea 0 | ? { $_.Message -match 'ZeroLogon'} | Select @{N='UTC Time'; E={ $_.TimeCreated.ToUniversalTime() }}
+Get-WinEvent -FilterHashtable @{ Path="DC01.northpole.local-KAPE\uploads\auto\C%3A\Windows\System32\winevt\Logs\System.evtx"; StartTime=(Get-Date "2023-12-13"); Id=7036 } -ea 0 | ? { $_.Message -match 'ZeroLogon'} | Select @{N='UTC Time'; E={ $_.TimeCreated.ToUniversalTime() }}
 
 UTC Time
 --------
@@ -132,7 +130,7 @@ UTC Time
 12/13/2023 9:24:24 AM
 {% endhighlight %}
 
-| **Answer for 4** | `2023-12-13 09:24:24` |
+{% include htb_flag.html id="4" description="What date & time was the unusual service start?" flag="2023-12-13 09:24:24" %}
 
 ### 5. What was the TA's IP address within our internal network?
 
@@ -140,13 +138,13 @@ We previously established that a non-local IP address was used for attacking the
 
 ![Timeline Explorer](/img/htb/sherlock/optinseltrace-5/timeline_ip.png)
 
-| **Answer for #5** | `192.168.68.200` |
+{% include htb_flag.html id="5" description="What was the TA's IP address within our internal network?" flag="192.168.68.200" %}
 
 ### 6. Please list all user accounts the TA utilised during their access. (Ascending order)
 
 The previous screenshot also shows which accounts that was used to access the Domain Controller from that IP.
 
-| **Answer for #6** | `Administrator, Bytesparkle` |
+{% include htb_flag.html id="6" description="Please list all user accounts the TA utilised during their access. (Ascending order)" flag="Administrator, Bytesparkle" %}
 
 ### 7. What was the name of the scheduled task created by the TA?
 
@@ -157,7 +155,7 @@ There is a very suspicious task creation:
 
 The task name includes the path, but we're only looking for the task name. We can also find evidence of this task in the KAPE files `DC01.northpole.local-KAPE\uploads\auto\C%3A\Windows\System32\Tasks\Microsoft\svc_vnc`.
 
-| **Answer for #7** | `svc_vnc` |
+{% include htb_flag.html id="7" description="What was the name of the scheduled task created by the TA?" flag="svc_vnc" %}
 
 ### 8. Santa's memory is a little bad recently! He tends to write a lot of stuff down, but all our critical files have been encrypted! Which creature is Santa's new sleigh design planning to use?
 
@@ -324,14 +322,14 @@ We placed our files in the directory, ran the `.dll` and now we have files with 
 
 Seems like our method worked - there is a PDF that describes the usage of "Enchanted Unicorns", but the answer is looking for the animal in singular form.
 
-| **Answer for #8** | `Unicorn` |
+{% include htb_flag.html id="8" description="Santa's memory is a little bad recently! He tends to write a lot of stuff down, but all our critical files have been encrypted! Which creature is Santa's new sleigh design planning to use?" flag="Unicorn" %}
 
 ### 9. Please confirm the process ID of the process that encrypted our files.
 
 This is a bit more complicated, as we need to figure out *when* the files were encrypted and *how* they got encrypted. Our trusty `$MFT` file may contains some information. 
 
 {% highlight powershell %}
-PS> MFTECmd.exe -f 'DC01.northpole.local-KAPE\uploads\ntfs\%5C%5C.%5CC%3A\$MFT' --csv .
+MFTECmd.exe -f 'DC01.northpole.local-KAPE\uploads\ntfs\%5C%5C.%5CC%3A\$MFT' --csv .
 MFTECmd version 1.2.2.1
 ... TRUNCATED ...
         CSV output will be saved to 20231228215514_MFTECmd_$MFT_Output.csv
@@ -340,7 +338,7 @@ MFTECmd version 1.2.2.1
 Now let's investigate the content of the csv
 
 {% highlight powershell %}
-PS C:\temp> Import-Csv '20231228215514_MFTECmd_$MFT_Output.csv' | ? { $_.Extension -eq '.xmax' } | Select Created0x10
+Import-Csv '20231228215514_MFTECmd_$MFT_Output.csv' | ? { $_.Extension -eq '.xmax' } | Select Created0x10
 
 Created0x10
 -----------
@@ -356,7 +354,7 @@ Created0x10
 We have a lot of events around `2023-12-13 11:03:20` and a couple of seconds after that. There are multiple event log entries to store process creation events, but none of which shows the information that we need. Let's search all our event logs for events happening at these two seconds.
 
 {% highlight powershell %}
-PS> Get-ChildItem -Path "DC01.northpole.local-KAPE\uploads\auto\C%3A\Windows" -Include '*.evtx' -Recurse | % { Get-WinEvent -FilterHashtable @{ Path=$_.FullName; StartTime=(Get-Date "2023-12-13 12:03:20"); EndTime=(Get-Date "2023-12-13 12:03:22") } -ea 0 }
+Get-ChildItem -Path "DC01.northpole.local-KAPE\uploads\auto\C%3A\Windows" -Include '*.evtx' -Recurse | % { Get-WinEvent -FilterHashtable @{ Path=$_.FullName; StartTime=(Get-Date "2023-12-13 12:03:20"); EndTime=(Get-Date "2023-12-13 12:03:22") } -ea 0 }
 
 
    ProviderName: Microsoft-Windows-UAC-FileVirtualization
@@ -374,7 +372,7 @@ TimeCreated                      Id LevelDisplayName Message
 The good thing is that we don't have an awful amount of events occuring here, and there are only events occuring in the `Microsoft-Windows-UAC-FileVirtualization` event log. The `4000` event seems to be something we'd like to look at bit more into.
 
 {% highlight powershell %}
-PS> Get-WinEvent -FilterHashtable @{ Path="DC01.northpole.local-KAPE\uploads\auto\C%3A\Windows\System32\winevt\Logs\Microsoft-Windows-UAC-FileVirtualization%254Operational.evtx"; StartTime=(Get-Date "2023-12-13 12:03:20"); EndTime=(Get-Date "2023-12-13 12:03:22"); Id=4000 } -ea 0  | Select -First 1 *
+Get-WinEvent -FilterHashtable @{ Path="DC01.northpole.local-KAPE\uploads\auto\C%3A\Windows\System32\winevt\Logs\Microsoft-Windows-UAC-FileVirtualization%254Operational.evtx"; StartTime=(Get-Date "2023-12-13 12:03:20"); EndTime=(Get-Date "2023-12-13 12:03:22"); Id=4000 } -ea 0  | Select -First 1 *
 
 
 Message              : Virtual file "\Device\HarddiskVolume4\ProgramData\VMware\VMware VGAuth\vgauth.conf.xmax" created.
@@ -410,7 +408,7 @@ Properties           : {System.Diagnostics.Eventing.Reader.EventProperty, System
 
 This shows us a `ProcessId` which is exactly what we are looking for.
 
-| **Answer for #9** | `5828` |
+{% include htb_flag.html id="9" description="Please confirm the process ID of the process that encrypted our files." flag="5828" %}
 
 ## Congratulations
 
