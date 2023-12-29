@@ -263,7 +263,18 @@ We can fiddle around in Ghidra, and search for some of the strings - and end up 
 
 ![Ghidra](/img/htb/sherlock/optinseltrace-5/ghidra_xor.png)
 
-If something has been XOR'ed with a string, and you XOR it again with the same string - it returns to its original state. The best option here would be to write a python script to XOR the files we need to recover. The user `mark0smith` used the following script in his writeup for the same:
+If something has been XOR'ed with a string, and you XOR it again with the same string - it returns to its original state. The best option would be to use tools readily to your disposal, such as [CyberChef](https://gchq.github.io/CyberChef).
+
+___
+#### Proper Solution
+With CyberChef we can also XOR our file.
+
+`Open File As Input` and select your `.xmax` file, choose `XOR` in your recipe, input the `key` = `EncryptingC4Fun!` and change the type to `UTF8`
+![CyberChef XOR](/img/htb/sherlock/optinseltrace-5/cyberxor.png)
+
+___
+#### Alternate Solution
+The user `mark0smith` used the following script in his writeup for the same:
 
 {% highlight python %}
 XOR_KEY = b"EncryptingC4Fun!"
@@ -282,6 +293,8 @@ def decrypt(filename):
 
 # decrypt("topsecret.png.xmax")
 {% endhighlight %}
+___
+#### My Solution
 
 But, I did not choose the best path. I simply executed the malware and had it re-XOR the original files, not the best way to do dynamic analysis.
 
