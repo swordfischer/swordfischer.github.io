@@ -3,10 +3,7 @@ layout: post
 title:  "Sherlocks - OpTinselTrace-5"
 category: HTB
 ---
-| <img src="/img/htb/sherlock/optinseltrace-5/logo.png" height="64" /> | [OpTinselTrace-5](https://app.hackthebox.com/sherlocks/OpTinselTrace-5) |
-|-------|---------|
-| Difficulty | Hard |
-| Scenario | You'll notice a lot of our critical server infrastructure was recently transferred from the domain of our MSSP - Forela.local over to Northpole.local. We actually managed to purchase some second hand servers from the MSSP who have confirmed they are as secure as Christmas is! It seems not as we believe christmas is doomed and the attackers seemed to have the stealth of a clattering sleigh bell, or they didn’t want to hide at all!!!!!! We have found nasty notes from the Grinch on all of our TinkerTech workstations and servers! Christmas seems doomed. Please help us recover from whoever committed this naughty attack! |
+{% include htb_sherlock.html title="OpTinselTrace-5" difficulty="Hard" scenario="You'll notice a lot of our critical server infrastructure was recently transferred from the domain of our MSSP - Forela.local over to Northpole.local. We actually managed to purchase some second hand servers from the MSSP who have confirmed they are as secure as Christmas is! It seems not as we believe christmas is doomed and the attackers seemed to have the stealth of a clattering sleigh bell, or they didn’t want to hide at all!!!!!! We have found nasty notes from the Grinch on all of our TinkerTech workstations and servers! Christmas seems doomed. Please help us recover from whoever committed this naughty attack!" %}
 
 {% include danger.html content="<p>THIS SHERLOCK CONTAINS MALWARE.</p><p>CONSIDER YOUR ACTIONS.</p>" %}
 
@@ -23,9 +20,18 @@ category: HTB
 9. [Please confirm the process ID of the process that encrypted our files.](#9-please-confirm-the-process-id-of-the-process-that-encrypted-our-files)
 
 # Discussion
-First, we need to grab the `optinseltrace5.zip` file, and unzip it, it contains two files `DC01.northpole.local-KAPE.zip` and `encrypted_files_suspicious_file.zip`. The first is a forensic collection of data, and the latter is some encrypted files with `.xmax` ending and a `splunk_svc.dll` file.
+We have read the scenario, and the tasks we are looking to answer. There are some points of information that we can pull from this, that can assist us in our further analysis.
+- A domain controller has been exploited
+- Files have been encrypted
+
+Some of the keywords here are "task", "encrypt", "exploit".
+
+It may not be all the relevant information that we can deduce, but limiting the information that we look for is crucial when sifting through mountains of data.
+
 
 # Answering the tasks
+First, we need to grab the `optinseltrace5.zip` file, and unzip it, it contains two files `DC01.northpole.local-KAPE.zip` and `encrypted_files_suspicious_file.zip`. The first is a forensic collection of data, and the latter is some encrypted files with `.xmax` ending and a `splunk_svc.dll` file.
+
 Let's start by analyzing the data in our KAPE directory. Most likely, the CVE will not be shown as a clear-text string but rather a series of actions.
 
 I recently came to learn of [Hayabusa](https://github.com/Yamato-Security/hayabusa), so I'll be using that. We'll just pull all information and dump that into a CSV we can view with a tool like [TimelineExplorer](https://ericzimmerman.github.io/#!index.md).

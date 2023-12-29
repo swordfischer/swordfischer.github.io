@@ -3,10 +3,7 @@ layout: post
 title:  "Sherlocks - OpTinselTrace-2"
 category: HTB
 ---
-| <img src="/img/htb/sherlock/optinseltrace-2/logo.png" height="64" /> | [OpTinselTrace-2](https://app.hackthebox.com/sherlocks/OpTinselTrace-2) |
-|-------|---------|
-| Difficulty | Easy |
-| Scenario | It seems our precious technology has been leaked to the threat actor. Our head Elf, PixelPepermint, seems to think that there were some hard-coded sensitive URLs within the technology sent. Please audit our Sparky Cloud logs and confirm if anything was stolen! PS - Santa likes his answers in UTC... |
+{% include htb_sherlock.html title="OpTinselTrace-2" difficulty="Easy" scenario="It seems our precious technology has been leaked to the threat actor. Our head Elf, PixelPepermint, seems to think that there were some hard-coded sensitive URLs within the technology sent. Please audit our Sparky Cloud logs and confirm if anything was stolen! PS - Santa likes his answers in UTC..."  %}
 
 # Tasks
 
@@ -21,10 +18,18 @@ category: HTB
 9. [Based on the analysis completed Santa Claus has asked for some advice. What is the ARN of the S3 Bucket that requires locking down?](#9-based-on-the-analysis-completed-santa-claus-has-asked-for-some-advice-what-is-the-arn-of-the-s3-bucket-that-requires-locking-down)
 
 # Discussion
-First, we need to grab the `optinseltrace2.zip` file, and unzip it, it contains a folder called `optinseltrace2-cloudtrail`.
-This is a dump of an Amazon Web Services cloud service, where the majority of the information is stored in json format.
+We have read the scenario, and the tasks we are looking to answer. There are some points of information that we can pull from this, that can assist us in our further analysis.
+- The TA has automated retrieval of content from an open S3 bucket
+- The TA as accessed a file with credentials, potentially compromising a private S3 bucket
+- The TA may have grabbed a VPN file.
+
+Some of the keywords here are "vpn" and "private".
+
+It may not be all the relevant information that we can deduce, but limiting the information that we look for is crucial when sifting through mountains of data.
 
 # Answering the tasks
+First, we need to grab the `optinseltrace2.zip` file, and unzip it, it contains a folder called `optinseltrace2-cloudtrail`.
+This is a dump of an Amazon Web Services cloud service, where the majority of the information is stored in json format.
 
 ### 1. What is the MD5 sum of the binary the Threat Actor found the S3 bucket location in?
 This references the `top-secret` directory we found in OpTinselTrace-1, and the content of the `santa_deliveries.zip` file.
@@ -48,7 +53,7 @@ We `strings` the binary, just to confirm there is references for AWS - which the
 ### 2. What time did the Threat Actor begin their automated retrieval of the contents of our exposed S3 bucket?
 Now we need to determine which IP the TA is using, to figure out when they were pulling data from the S3 bucket.
 
-Let's start by figuring out which source IP addresses are present in our cloudtrail logs.
+Let's start by figuring out which source IP addresses are present in our cloudtrail logs. The obvious choice here is [jq](https://jqlang.github.io/jq/).
 
 {% highlight bash %}
 OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | .sourceIPAddress' | sort | uniq -c 2>/dev/null

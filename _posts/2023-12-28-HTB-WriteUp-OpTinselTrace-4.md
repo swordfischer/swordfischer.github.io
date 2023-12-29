@@ -3,10 +3,7 @@ layout: post
 title:  "Sherlocks - OpTinselTrace-4"
 category: HTB
 ---
-| <img src="/img/htb/sherlock/optinseltrace-4/logo.png" height="64" /> | [OpTinselTrace-4](https://app.hackthebox.com/sherlocks/OpTinselTrace-4) |
-|-------|---------|
-| Difficulty | Easy |
-| Scenario | Printers are important in Santa’s workshops, but we haven’t really tried to secure them! The Grinch and his team of elite hackers may try and use this against us! Please investigate using the packet capture provided! The printer server IP Address is 192.168.68.128 |
+{% include htb_sherlock.html title="OpTinselTrace-4" difficulty="Easy" scenario="Printers are important in Santa’s workshops, but we haven’t really tried to secure them! The Grinch and his team of elite hackers may try and use this against us! Please investigate using the packet capture provided! The printer server IP Address is 192.168.68.128" %}
 
 # Tasks
 
@@ -22,14 +19,22 @@ category: HTB
 10. [When did the Grinch attempt to delete a file from the printer? (UTC)](#10-when-did-the-grinch-attempt-to-delete-a-file-from-the-printer-utc)
 
 # Discussion
+We have read the scenario, and the tasks we are looking to answer. There are some points of information that we can pull from this, that can assist us in our further analysis.
+- This involves printers and therefore likely PJL commands
+- There is important files stored on the printer
+
+Some of the keywords here are "delete", "server", "elfin", "management", "nice".
+
+It may not be all the relevant information that we can deduce, but limiting the information that we look for is crucial when sifting through mountains of data.
+
+
+# Answering the tasks
 First, we need to grab the `optinseltrace4.zip` file, and unzip it, it contains another zip file named `networktraffic.zip`, which contains a packet capture file.
 This is a dump of some network communication that we need to dig into.
 
-# Answering the tasks
-
 ### 1. The performance of the network printer server has become sluggish, causing interruptions in the workflow at the North Pole workshop. Santa has directed us to generate a support request and examine the network data to pinpoint the source of the issue. He suspects that the Grinch and his group may be involved in this situation. Could you verify if there is an IP Address that is sending an excessive amount of traffic to the printer server?
 
-During the scenario we were informed of the IP address for the printer, so let us filter in Wireshark for connections with that ip as the destination. `ip.dst == 192.168.68.128`.
+During the scenario we were informed of the IP address for the printer, so let us filter in [Wireshark](https://www.wireshark.org/) for connections with that ip as the destination. `ip.dst == 192.168.68.128`.
 
 ![Initial Scan](/img/htb/sherlock/optinseltrace-4/initial_scan.png)
 

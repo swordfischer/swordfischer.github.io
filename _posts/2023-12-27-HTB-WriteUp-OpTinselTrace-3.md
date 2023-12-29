@@ -3,18 +3,9 @@ layout: post
 title:  "Sherlocks - OpTinselTrace-3"
 category: HTB
 ---
-| <img src="/img/htb/sherlock/optinseltrace-3/logo.png" height="64" /> | [OpTinselTrace-3](https://app.hackthebox.com/sherlocks/OpTinselTrace-3) |
-|-------|---------|
-| Difficulty | Medium |
-| Scenario | Oh no! Our IT admin is a bit of a cotton-headed ninny-muggins, ByteSparkle left his VPN configuration file in our fancy private S3 location! The nasty attackers may have gained access to our internal network. We think they compromised one of our TinkerTech workstations. Our security team has managed to grab you a memory dump - please analyse it and answer the questions! Santa is waiting… |
+{% include htb_sherlock.html title="OpTinselTrace-3" difficulty="Medium" scenario="Oh no! Our IT admin is a bit of a cotton-headed ninny-muggins, ByteSparkle left his VPN configuration file in our fancy private S3 location! The nasty attackers may have gained access to our internal network. We think they compromised one of our TinkerTech workstations. Our security team has managed to grab you a memory dump - please analyse it and answer the questions! Santa is waiting…" %}
 
 # Tasks
-
-# Discussion
-First, we need to grab the `optinseltrace3.zip` file, and unzip it, it contains a file called `santa_claus.bin`.
-This is a memory dump, and we need to use Volatility for that (or MemProcFS)
-
-# Answering the tasks
 
 1. [What is the name of the file that is likely copied from the shared folder (including the file extension)?](#1-what-is-the-name-of-the-file-that-is-likely-copied-from-the-shared-folder-including-the-file-extension)
 2. [What is the file name used to trigger the attack (including the file extension)?](#2-what-is-the-file-name-used-to-trigger-the-attack-including-the-file-extension)
@@ -29,6 +20,21 @@ This is a memory dump, and we need to use Volatility for that (or MemProcFS)
 11. [What is the original name of the file that was ingressed to the victim?](#11-what-is-the-original-name-of-the-file-that-was-ingressed-to-the-victim)
 12. [What is the name of the process targeted by procdump.exe?](#12-what-is-the-name-of-the-process-targeted-by-procdumpexe)
 
+# Discussion
+
+We have read the scenario, and the tasks we are looking to answer. There are some points of information that we can pull from this, that can assist us in our further analysis.
+- A payload was transferred to the victim
+- The payload is in multiple stages
+- The payload is obfuscated
+- It is shellcode
+
+Some of the keywords here are "link", "present", "powershell", and "vbs".
+
+It may not be all the relevant information that we can deduce, but limiting the information that we look for is crucial when sifting through mountains of data.
+
+# Answering the tasks
+First, we need to grab the `optinseltrace3.zip` file, and unzip it, it contains a file called `santa_claus.bin`.
+This is a memory dump, and we need to use [Volatility](https://github.com/volatilityfoundation/volatility3) for that (or [MemProcFS](https://github.com/ufrisk/MemProcFS))
 
 ### 1. What is the name of the file that is likely copied from the shared folder (including the file extension)?
 This question was puzzling me for quite some time, but I knew I had to find some files at least - and usually files are copied/downloaded to the `C:\Users` and then `AppData`, `Desktop`, `Documents` or `Downloads`.
@@ -79,7 +85,7 @@ Well, this looks suspiciously like a payload. I think this zip file is the one o
 
 ### 2. What is the file name used to trigger the attack (including the file extension)?
 
-When we are looking at the zip contents, we see a `lnk` shortcut file, and a `VB Script` file. Let's check out the shortcut file with LECmd:
+When we are looking at the zip contents, we see a `lnk` shortcut file, and a `VB Script` file. Let's check out the shortcut file with [LECmd](https://ericzimmerman.github.io/#!index.md):
 {% highlight powershell %}
 PS> LECmd.exe -f .\click_for_present.lnk
 LECmd version 1.5.0.0
@@ -95,7 +101,7 @@ Icon Location: C:\Windows\System32\shell32.dll
 {% endhighlight %}
 
 The execution policy is set to Bypass, and it passes an encoded PowerShell string - seems like a trigger. Let's just check that the encoded command does.
-CyberChef can assist us here, PowerShell encoded commands are usually Base64 encoded, UTF16-LE.
+[CyberChef](https://gchq.github.io/CyberChef/) can assist us here, PowerShell encoded commands are usually Base64 encoded, UTF16-LE.
 
 ![cyberchef_lnk](/img/htb/sherlock/optinseltrace-3/cyberchef_lnk.png)
 {% highlight powershell %}
@@ -115,6 +121,7 @@ We did most of the work during the last question, we know which files are being 
 ### 4. What is the name of the program used by the vbs script to execute the next stage?
 
 If we check the first 10 lines of the vbs script, we can see something that is slightly annoying
+
 {% highlight powershell %}
 PS> Get-Content -Head 10 -Path .\present.vbs
 Nonphilosophicalgloriat = LenB("Ritualizing")
@@ -299,10 +306,13 @@ We found the content of the `$present` variable, which is fetched by another fun
 | **Answer for #6** | `http://77.74.198.52/destroy_christmas/evil_present.jpg` |
 
 ### 7. What is the IP and port that the executable downloaded the shellcode from (IP:Port)?
-We can turn to Ghidra when we need to reverse an application or simply upload this file to a site like VirusTotal and see the sockets the application creates.
+We can turn to [Ghidra](https://ghidra-sre.org/) when we need to reverse an application or simply upload this file to a site like VirusTotal and see the sockets the application creates.
 ![present_calls](/img/htb/sherlock/optinseltrace-3/present_calls.png)
 
-We could also run the file on a device behind a REMnux machine for instance or similar, to show the connections. But it seems like it's using the `WS2_32.dll` library to do a call on port 445. The IP address is luckily in clear text.
+We could also run the file on a device behind a [REMnux](https://remnux.org/) machine for instance or similar, to show the connections. But it seems like it's using the `WS2_32.dll` library to do a call on port 445. The IP address is luckily in clear text.
+
+NOTE: user `tmechen` had a bit more luck with analyzing in Ghidra and provided a screenshot which shows the usage of [htons()](https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-htons) function, which indeed is the port number as previously assumed.
+![present_port](/img/htb/sherlock/optinseltrace-3/present_port.png)
 
 | **Answer for #6** | `77.74.198.52:445` |
 
@@ -388,7 +398,7 @@ From our output in #9, we also get the answer by the command `Add-MpPreference`
 
 ### 11. What is the original name of the file that was ingressed to the victim?
 
-If we read the next question, we get the answer. But what we should be doing, would be to extract the file from memory and investigate it with PEStudio or similar.
+If we read the next question, we get the answer. But what we should be doing, would be to extract the file from memory and investigate it with [PEStudio](https://www.winitor.com) or similar.
 
 {% highlight powershell %}
 PS> python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.dumpfiles --virtaddr 0xa48e00d10a90

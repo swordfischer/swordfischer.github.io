@@ -3,10 +3,7 @@ layout: post
 title:  "Sherlocks - OpTinselTrace-1"
 category: HTB
 ---
-| <img src="/img/htb/sherlock/optinseltrace-1/logo.png" height="64" /> | [OpTinselTrace-1](https://app.hackthebox.com/sherlocks/OpTinselTrace-1) |
-|-------|---------|
-| Difficulty | Easy |
-| Scenario | An elf named "Elfin" has been acting rather suspiciously lately. He's been working at odd hours and seems to be bypassing some of Santa's security protocols. Santa's network of intelligence elves has told Santa that the Grinch got a little bit too tipsy on egg nog and made mention of an insider elf! Santa is very busy with his naughty and nice list, so he’s put you in charge of figuring this one out. Please audit Elfin’s workstation and email communications. |
+{% include htb_sherlock.html title="OpTinselTrace-1" difficulty="Easy" scenario="An elf named \"Elfin\" has been acting rather suspiciously lately. He's been working at odd hours and seems to be bypassing some of Santa's security protocols. Santa's network of intelligence elves has told Santa that the Grinch got a little bit too tipsy on egg nog and made mention of an insider elf! Santa is very busy with his naughty and nice list, so he’s put you in charge of figuring this one out. Please audit Elfin’s workstation and email communications."  %}
 
 # Tasks
 1. [What is the name of the email client that Elfin is using?](#1-what-is-the-name-of-the-email-client-that-elfin-is-using)
@@ -239,7 +236,7 @@ Once again we head back into the email client, and look for something that is wr
 ### 16. The head elf PixelPeppermint has requested any passwords of Elfins to assist in the investigation down the line. What’s the windows password of Elfin’s host?
 
 With the standard triage done, we also receive the SYSTEM and SAM registry hives in our `elfidence_collection` directory, they are stored in the `C:\Windows\system32\config` path.
-We can use Mimikatz to extract the users NTLM hash, so we can crack it with HashCat.
+We can use [Mimikatz](https://github.com/ParrotSec/mimikatz) to extract the users NTLM hash, so we can crack it with [HashCat](https://hashcat.net/hashcat/).
 
 {% highlight bash %}
 mimikatz # lsadump::sam /system:".\elfidence_collection\TriageData\C\Windows\system32\config\SYSTEM" /sam:".\elfidence_collection\TriageData\C\Windows\system32\config\SAM"
