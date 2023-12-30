@@ -236,10 +236,29 @@ Once again we head back into the email client, and look for something that is wr
 ### 16. The head elf PixelPeppermint has requested any passwords of Elfins to assist in the investigation down the line. What’s the windows password of Elfin’s host?
 
 With the standard triage done, we also receive the SYSTEM and SAM registry hives in our `elfidence_collection` directory, they are stored in the `C:\Windows\system32\config` path.
-We can use [Mimikatz](https://github.com/ParrotSec/mimikatz) to extract the users NTLM hash, so we can crack it with [HashCat](https://hashcat.net/hashcat/).
+
+We can use [Mimikatz](https://github.com/ParrotSec/mimikatz) to extract the users NTLM hash or use `impacket-secretsdump`. Then we can crack it with [HashCat](https://hashcat.net/hashcat/).
+
+#### Impacket
 
 {% highlight bash %}
-mimikatz # lsadump::sam /system:".\elfidence_collection\TriageData\C\Windows\system32\config\SYSTEM" /sam:".\elfidence_collection\TriageData\C\Windows\system32\config\SAM"
+impacket-secretsdump -system SYSTEM -sam SAM LOCAL
+
+[*] Target system bootKey: 0x1679d0a0bee2b5804325deeddb0ec9fe
+[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:95199bba413194e567908de6220d677e:::
+Elfin:1001:aad3b435b51404eeaad3b435b51404ee:529848fe56902d9595be4a608f9fbe89:::
+[*] Cleaning up...
+
+{% endhighlight %}
+
+#### Mimikatz
+
+{% highlight bash %}
+mimikatz # lsadump::sam /system:".C\Windows\system32\config\SYSTEM" /sam:".\C\Windows\system32\config\SAM"
 
 ... TRUNCATED ...
 
@@ -252,7 +271,22 @@ User : Elfin
 mimikatz #
 {% endhighlight %}
 
-Let us save the hash to a file and have it processed with HashCat.
+Once we have the hash, we can check the hash against a service, or crack it ourselves.
+
+____
+#### Quick Solution
+
+We can utilize [ntlm.pw](https://ntlm.pw) to check the NTLM
+{% highlight bash %}
+curl https://ntlm.pw/529848fe56902d9595be4a608f9fbe89
+Santaknowskungfu
+{% endhighlight %}
+
+If ntlm.pw does not know the hash, we can attempt to crack it ourselves.
+
+____
+#### Slow Solution
+Save the hash to a file and have it processed with HashCat.
 
 {% highlight powershell %}
 .\hashcat.exe -m 1000 elfin_ntlm.txt rockyou.txt

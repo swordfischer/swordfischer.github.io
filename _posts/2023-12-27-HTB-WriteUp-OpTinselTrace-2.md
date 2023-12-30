@@ -34,14 +34,14 @@ This is a dump of an Amazon Web Services cloud service, where the majority of th
 ### 1. What is the MD5 sum of the binary the Threat Actor found the S3 bucket location in?
 This references the `top-secret` directory we found in OpTinselTrace-1, and the content of the `santa_deliveries.zip` file.
 {% highlight bash %}
-kali$ unzip santa_deliveries.zip
+$ unzip santa_deliveries.zip
 Archive:  santa_deliveries.zip
   inflating: santa_deliveries        
 
-kali$ md5sum santa_deliveries                   
+$ md5sum santa_deliveries                   
 62d5c1f1f9020c98f97d8085b9456b05  santa_deliveries
 
-kali$ strings santa_deliveries | grep 'aws'
+$ strings santa_deliveries | grep 'aws'
 https://papa-noel.s3.eu-west-3.amazonaws.com/santa-list.csv
 
 {% endhighlight %}
@@ -56,7 +56,7 @@ Now we need to determine which IP the TA is using, to figure out when they were 
 Let's start by figuring out which source IP addresses are present in our cloudtrail logs. The obvious choice here is [jq](https://jqlang.github.io/jq/).
 
 {% highlight bash %}
-OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | .sourceIPAddress' | sort | uniq -c 2>/dev/null
+$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | .sourceIPAddress' | sort | uniq -c 2>/dev/null
       1 "109.205.185.126"
       2 "138.199.59.46"
      13 "191.101.31.26"
@@ -93,7 +93,7 @@ Keep in mind that I'm particularly good at ending up in one-liner hell, and a be
 But, let's filter the events that has happened, based on the source IPs:
 
 {% highlight bash %}
-OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress as $a | ["109.205.185.126", "138.199.59.46", "191.101.31.26", "191.101.31.57", "195.181.170.226", "3.236.115.9", "3.236.226.247", "45.133.193.41", "45.148.104.164"] | index($a) ) | [.sourceIPAddress, .requestParameters.bucketName, .eventName] | @csv' | sort | uniq -c 2>/dev/null 
+$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress as $a | ["109.205.185.126", "138.199.59.46", "191.101.31.26", "191.101.31.57", "195.181.170.226", "3.236.115.9", "3.236.226.247", "45.133.193.41", "45.148.104.164"] | index($a) ) | [.sourceIPAddress, .requestParameters.bucketName, .eventName] | @csv' | sort | uniq -c 2>/dev/null 
       1 "\"109.205.185.126\",\"papa-noel\",\"HeadBucket\""
       1 "\"138.199.59.46\",\"papa-noel\",\"GetBucketAcl\""
       1 "\"138.199.59.46\",\"papa-noel\",\"HeadBucket\""
@@ -118,7 +118,7 @@ OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select
 This gives us a list of IP addresses, which buckets they have accessed and what events they made on those buckets. The TA is mentioned to be pulling data, which leads me to look at the GetObjects solely.
 
 {% highlight bash %}
-OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress as $a | ["109.205.185.126", "138.199.59.46", "191.101.31.26", "191.101.31.57", "195.181.170.226", "3.236.115.9", "3.236.226.247", "45.133.193.41", "45.148.104.164"] | index($a) ) | select(.eventName == "GetObject") | [.sourceIPAddress, .requestParameters.bucketName, .eventName] | @csv' | sort | uniq -c 2>/dev/null 
+$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress as $a | ["109.205.185.126", "138.199.59.46", "191.101.31.26", "191.101.31.57", "195.181.170.226", "3.236.115.9", "3.236.226.247", "45.133.193.41", "45.148.104.164"] | index($a) ) | select(.eventName == "GetObject") | [.sourceIPAddress, .requestParameters.bucketName, .eventName] | @csv' | sort | uniq -c 2>/dev/null 
       2 "\"191.101.31.26\",\"papa-noel\",\"GetObject\""
      43 "\"191.101.31.57\",\"papa-noel\",\"GetObject\""
       1 "\"3.236.226.247\",\"papa-noel\",\"GetObject\""
@@ -128,7 +128,7 @@ OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select
 Now we are at a point where we have 4 source IPs we can look at. There are two here that stands out: `191.101.31.57` and `45.133.193.41`. The first because it have made so many gets compared to the others, an the second one because of the access to the `north-pole-private` bucket. But let's check the one with the many hits out, intution tells me that this is the IP used by the TA to pull data.
 
 {% highlight bash %}
-OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress == "191.101.31.57" ) | select(.eventName == "GetObject") | [.eventTime, .sourceIPAddress, .userAgent, .requestParameters.key] | @csv'
+$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress == "191.101.31.57" ) | select(.eventName == "GetObject") | [.eventTime, .sourceIPAddress, .userAgent, .requestParameters.key] | @csv'
 "\"2023-11-29T08:24:07Z\",\"191.101.31.57\",\"[python-requests/2.25.1]\",\"NPoleScripts/.git/description\""
 "\"2023-11-29T08:24:07Z\",\"191.101.31.57\",\"[python-requests/2.25.1]\",\"NPoleScripts/.git/COMMIT_EDITMSG\""
 "\"2023-11-29T08:24:07Z\",\"191.101.31.57\",\"[python-requests/2.25.1]\",\"NPoleScripts/.git/hooks/applypatch-msg.sample\""
@@ -197,22 +197,22 @@ As we pulled the user agent, we know that the `requests` python library was used
 For this we need to check some of the files that was fetched by the TA. If you remember, the `santa_deliveries` binary had a link to `https://papa-noel.s3.eu-west-3.amazonaws.com/santa-list.csv`. I wonder if we can fetch some of the files without authentication. 
 
 {% highlight bash %}
-kali$ curl https://papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts/backup.py
-kali$ curl https://papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts/check.js
-kali$ curl https://papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts/claus.py
-kali$ curl https://papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts/disk.ps
-kali$ curl https://papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts/organise.rb
-kali$ curl https://papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts/update.sh
+$ curl https://papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts/backup.py
+$ curl https://papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts/check.js
+$ curl https://papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts/claus.py
+$ curl https://papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts/disk.ps
+$ curl https://papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts/organise.rb
+$ curl https://papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts/update.sh
 
 {% endhighlight %}
 
 Well, that didn't yield any useful results (the scripts had data, but removed it as it was irrelevant), but let's try to grab the git repository - could be that someone made an oopsie.
 
 {% highlight bash %}
-OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress == "191.101.31.57" ) | select(.eventName == "GetObject") |  .requestParameters.key' | sed 's\^"\https://papa-noel.s3.eu-west-3.amazonaws.com/\g' | sed 's\"\\' | xargs -L1 wget -m
+$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress == "191.101.31.57" ) | select(.eventName == "GetObject") |  .requestParameters.key' | sed 's\^"\https://papa-noel.s3.eu-west-3.amazonaws.com/\g' | sed 's\"\\' | xargs -L1 wget -m
 
-OpTinselTrace-2$ cd papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts                                                 
-OpTinselTrace-2/papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts$ git log
+$ cd papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts                                                 
+$ git log
 commit a92e975c8c52221d5c1c371d5595f65eb13f8be5 (HEAD -> master)
 Author: Author Name <bytesparkle@papanoel.co.uk>
 Date:   Tue Nov 28 09:42:16 2023 +0000
@@ -229,7 +229,7 @@ Date:   Tue Nov 28 09:15:34 2023 +0000
 Well, look at that, `bytesparkle` made a commit message mentioning they removed some credentials. Let's check the change they did.
 
 {% highlight diff %}
-OpTinselTrace-2/papa-noel.s3.eu-west-3.amazonaws.com/NPoleScripts$ git diff a92e975c8c52221d5c1c371d5595f65eb13f8be5 5d24a8f411fc931b54fb9a4b58b6b55f1016c34d
+$ git diff a92e975c8c52221d5c1c371d5595f65eb13f8be5 5d24a8f411fc931b54fb9a4b58b6b55f1016c34d
 diff --git a/claus.py b/claus.py
 index 38938fa..6ee67e3 100644
 --- a/claus.py
@@ -256,7 +256,7 @@ Now we know, `claus.py` used to have two variables `AWS_SECRET_KEY` and `AWS_ACC
 So far, we have found one malicious IP address `191.101.31.57`, then we need to find the second one. If we go back to one our previous queries, and modify it a bit to contain the IPs which pulled data, that is not the first malicious IP.
 
 {% highlight bash %}
-find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress as $a | ["191.101.31.26", "3.236.226.247", "45.133.193.41"] | index($a) ) | select(.eventName == "GetObject") | [.sourceIPAddress, .requestParameters.bucketName, .eventName, .requestParameters.key] | @csv'  
+$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress as $a | ["191.101.31.26", "3.236.226.247", "45.133.193.41"] | index($a) ) | select(.eventName == "GetObject") | [.sourceIPAddress, .requestParameters.bucketName, .eventName, .requestParameters.key] | @csv'  
 "\"45.133.193.41\",\"north-pole-private\",\"GetObject\",\"bytesparkle.ovpn\""
 "\"45.133.193.41\",\"north-pole-private\",\"GetObject\",\"santa_journey_log.csv\""
 "\"3.236.226.247\",\"papa-noel\",\"GetObject\",\"favicon.ico\""
@@ -273,7 +273,7 @@ As mentioned earlier, I found the request to the `north-pole-private` was a bit 
 We kind of already answered this in the previous question, we just failed to print a timestamp. We could also answer this by search for VPN in the `requestParameter.key`.
 
 {% highlight bash %}
-OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress as $a | ["191.101.31.26", "3.236.226.247", "45.133.193.41"] | index($a) ) | select(.eventName == "GetObject") | [.eventTime, .sourceIPAddress, .requestParameters.bucketName, .eventName, .requestParameters.key] | @csv'  
+$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress as $a | ["191.101.31.26", "3.236.226.247", "45.133.193.41"] | index($a) ) | select(.eventName == "GetObject") | [.eventTime, .sourceIPAddress, .requestParameters.bucketName, .eventName, .requestParameters.key] | @csv'  
 "\"2023-11-29T10:16:53Z\",\"45.133.193.41\",\"north-pole-private\",\"GetObject\",\"bytesparkle.ovpn\""
 {% endhighlight %}
 
@@ -283,7 +283,7 @@ OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select
 We can check the identity property of our output, perhaps for the download of the VPN file.
 
 {% highlight bash %}
-OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress as $a | ["191.101.31.57", "45.133.193.41"] | index($a) ) | select(.eventName == "GetObject") | [.eventTime, .sourceIPAddress, .requestParameters.bucketName, .eventName, .requestParameters.key, .userIdentity.userName] | @csv'  
+$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress as $a | ["191.101.31.57", "45.133.193.41"] | index($a) ) | select(.eventName == "GetObject") | [.eventTime, .sourceIPAddress, .requestParameters.bucketName, .eventName, .requestParameters.key, .userIdentity.userName] | @csv'  
 "\"2023-11-29T10:16:53Z\",\"45.133.193.41\",\"north-pole-private\",\"GetObject\",\"bytesparkle.ovpn\",\"elfadmin\""
 "\"2023-11-29T10:16:53Z\",\"45.133.193.41\",\"north-pole-private\",\"GetObject\",\"santa_journey_log.csv\",\"elfadmin\""
 
@@ -296,7 +296,7 @@ OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select
 As we know that the `north-pole-private` bucket was accessed with credentials, those secrets should just be rotated. So the suggestion should be for Santa to lock down the publicly available bucket we grabbed the git repository from.
 
 {% highlight bash %}
-OpTinselTrace-2$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress as $a | ["191.101.31.57"] | index($a) ) | select(.eventName == "GetObject") | [.eventTime, .sourceIPAddress, .requestParameters.bucketName, .resources[0].ARN] | @csv'  
+$ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddress as $a | ["191.101.31.57"] | index($a) ) | select(.eventName == "GetObject") | [.eventTime, .sourceIPAddress, .requestParameters.bucketName, .resources[0].ARN] | @csv'  
 "\"2023-11-29T08:24:07Z\",\"191.101.31.57\",\"papa-noel\",\"arn:aws:s3:::papa-noel/NPoleScripts/.git/description\""
 "\"2023-11-29T08:24:07Z\",\"191.101.31.57\",\"papa-noel\",\"arn:aws:s3:::papa-noel/NPoleScripts/.git/COMMIT_EDITMSG\""
 "\"2023-11-29T08:24:07Z\",\"191.101.31.57\",\"papa-noel\",\"arn:aws:s3:::papa-noel/NPoleScripts/.git/hooks/applypatch-msg.sample\""

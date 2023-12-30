@@ -40,7 +40,7 @@ This is a memory dump, and we need to use [Volatility](https://github.com/volati
 This question was puzzling me for quite some time, but I knew I had to find some files at least - and usually files are copied/downloaded to the `C:\Users` and then `AppData`, `Desktop`, `Documents` or `Downloads`.
 
 {% highlight powershell %}
-python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.filescan | sls 'Users'
+python vol.py -f optinseltrace3\santaclaus.bin windows.filescan | sls 'Users'
 Progress:  100.00               PDB scanning finished
 ... TRUNCATED ...
 0xa48df8fb42a0  \Users\santaclaus\Desktop\present_for_santa.zip 216
@@ -52,7 +52,7 @@ Progress:  100.00               PDB scanning finished
 This yields some interesting files, a file called `present_for_santa.zip` and `present.exe`. Let's see if we can salvage those.
 
 {% highlight powershell %}
-python volatility3-develop\vol.py -f optinseltrace3\santaclaus.bin windows.dumpfiles --virtaddr 0xa48df8fb42a0
+python vol.py -f optinseltrace3\santaclaus.bin windows.dumpfiles --virtaddr 0xa48df8fb42a0
 Volatility 3 Framework 2.5.2
 Progress:  100.00               PDB scanning finished
 Cache   FileObject      FileName        Result
@@ -307,6 +307,34 @@ We found the content of the `$present` variable, which is fetched by another fun
 
 ### 7. What is the IP and port that the executable downloaded the shellcode from (IP:Port)?
 We can turn to [Ghidra](https://ghidra-sre.org/) when we need to reverse an application or simply upload this file to a site like VirusTotal and see the sockets the application creates.
+#### Virus Total
+If we decide to use Virus Total, we can use [vt-cli](https://github.com/VirusTotal/vt-cli) or [virustotal.com](https://virustotal.com).
+
+First off, we'll send the file for analysis to VT:
+{% highlight bash %}
+$ vt scan file file.0xa48e003d0530.0xa48dfe212c30.DataSectionObject.present.exe.dat
+file.0xa48e003d0530.0xa48dfe212c30.DataSectionObject.present.exe.dat Y2FhZDY3OTQyMGIwMDc0YWIxMjA0MDhjZDhjNDk1ZGI6MTcwMzk3MDQwOA==
+{% endhighlight %}
+
+Once done, we need to wait a while as the file is queued for analysis. We also need to decode the returned Base64 to use that for connectivity check, the decoded value contains a `:` and we need to remove the data after that.
+{% highlight bash %}
+$ echo 'Y2FhZDY3OTQyMGIwMDc0YWIxMjA0MDhjZDhjNDk1ZGI6MTcwMzk3MDQwOA=='| base64 -d | cut -d ':' -f 1
+caad679420b0074ab120408cd8c495db
+{% endhighlight %}
+
+{% highlight bash %}
+$ vt file behaviours caad679420b0074ab120408cd8c495db --format json | jq '.[] | select(.ip_traffic) | .ip_traffic | .[] | [.destination_ip, .destination_port] | @csv'
+"\"20.99.185.48\",443"
+"\"192.229.211.108\",80"
+"\"23.209.116.9\",443"
+"\"20.99.184.37\",443"
+"\"20.99.186.246\",443"
+"\"77.74.198.52\",445"
+"\"77.74.198.52\",445"
+{% endhighlight %}
+
+#### Analysis, Ghidra
+
 ![present_calls](/img/htb/sherlock/optinseltrace-3/present_calls.png)
 
 We could also run the file on a device behind a [REMnux](https://remnux.org/) machine for instance or similar, to show the connections. But it seems like it's using the `WS2_32.dll` library to do a call on port 445. The IP address is luckily in clear text.
