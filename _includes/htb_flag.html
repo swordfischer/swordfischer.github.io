@@ -1,3 +1,44 @@
+<style>
+.button.has-flag{
+    position: relative;
+    width: 90%;
+    margin: 0 1em 1em 1em;
+    padding: 1em;
+    height: 24px;
+    background-color: #111927;
+    border: 1px solid #1A2332;
+  }
+  
+  .has-flag .is-flag{
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 90%;
+    text-align: right;
+    margin: 0 1em 1em 1em;
+    padding: 1em;
+    font-family: monospace;
+    color: #9FEF00;
+  }
+  .is-flag-text{
+    position: absolute;
+    opacity: 1;
+    left: 0;
+    top: 0;
+    width: 90%;
+    z-index: 5;
+    margin: 0 1em 1em 1em;
+    padding: 1em;
+    background-color: #111927;
+    transition: all 10s;
+  }
+  
+  .button.has-flag:hover .is-flag-text{
+    opacity: 0;
+    z-index: -1;
+    transition: all 1s ease;
+  }
+</style>
 <div style="
   background-color: #1A2332;
   border: 1px solid #1A2332;
@@ -31,13 +72,10 @@
         padding: 0 1em;
         ">{{ include.description }}</p>
 		<div>
-			<p style="
-                width: 90%;
-                color: #9FEF00;
-                margin: 0 1em 1em 1em;
-                padding: 1em;
-                background-color: #111927;
-                border: 1px solid #1A2332">{{ include.flag }}</p>
+        <div class="button has-flag">
+          <span class="is-flag">{{ include.flag }}</span>
+          <span class="is-flag-text"><em>Flag</em></span>
+        </div>
 		</div>
 	</div>
 </div>
