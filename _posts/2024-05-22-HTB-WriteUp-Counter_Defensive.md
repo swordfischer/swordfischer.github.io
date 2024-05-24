@@ -14,7 +14,7 @@ There are some points of information that we can pull from the scenario, that ca
 # Answering the tasks
 First, we need to grab the `counter_defensive.zip` file, and unzip it, it contains another file named `evidence.ad1` - this is a [FTK Imager]() image.
 
-This was done during the CTF, and priorities were not on "the right way" - many roads lead to Hell, and mine is paved with wierd invocations. 
+This write-up was formalized during the CTF, and priorities were not on "the right way" - many roads lead to Hell, and mine is paved with weird invocations.
 
 Another important thing to note, is that I don't add **all** the steps I did before figuring out the solution. Sometimes a lot of time is spent on goosechases or rabbitholes - I learn from it, but there is not much value for you as a reader to go through that process (or perhaps there is). Nobody wants to see me run `strings` and `grep` a thousand times!
 
@@ -84,7 +84,7 @@ This is a webkit timestamp, which needs to be converted - this can be done with 
 
 ### [2/10] What is the full malicious command which is run whenever the user logs in?
 
-We need to find a malicious command that runs everytime the user logs on, and since the `ad1` only contains the user directory, we can limit our searching to the artifacts which are present within the user directories.
+We need to find a malicious command that runs everytime the user logs on, and since the `.ad1`-file only contains the user directory, we can limit our searching to the artifacts which are present within the user directories.
 
 Let's check the `NTUSER.DAT` registry hive with `Registry Explorer`. There are multiple keys in the HKCU hive, such as `Run` and `RunOnce` but no significant data here:
 ![Registry Explorer](/img/htb/challenges/counter-defensive/registry_explorer_run_1.png)
@@ -97,7 +97,7 @@ If we then check the `Winlogon` key, we find a suspicious command that is run up
 
 ### [3/10] Referring to the previous file, 'wct98BG.tmp', what is the first process that starts when the malicious file is opened?
 
-This one was a super time consuming one for me, as I focused too much on the `.tmp` file itself, rather the context of the file. My assumptions was the `.tmp` was a binary of sorts that would be executed once the user logged on. However that was not the case, looking at it with `Detect it Easy`, the file had quite high entropy, meaning that either it was obfuscated or just random junk data. It was the latter. I spent a significant time trying to OSINT myself to the `Black-Myth-Wukong64bit.exe` binary, so I could execute it and understand the process flow. I also looked at all artifacts that I could think of which was available, that would contain the process that was executed. 
+This one was a super time consuming one for me, as I focused too much on the `.tmp` file itself, rather the context of the file. My assumptions was the `.tmp` was a binary of sorts that would be executed once the user logged on. However that was not the case, looking at it with `Detect it Easy`, the file had quite high entropy, meaning that either it was obfuscated or just random junk data. It was the latter. I spent a significant time trying to see if I could OSINT the `Black-Myth-Wukong64bit.exe` binary, so it could be executed and investigated dynamically. I also looked at all artifacts that I could think of which was available, that would contain the process that was executed. 
 
 Going back and forth with my team, we thought about how the "binary" could be executed (still assuming it was an actual binary) - and the working theory that perhaps the environment variable `%PWS%` (which translated to `powershell`) was tampered with so that it would decrypt the `.tmp` binary.
 This wasn't the case either, but it trigged another conversation about hijacking which process will be executed when opening a file with explorer.
@@ -390,7 +390,7 @@ AAE...REDACTED...cy4
 695..REDACTED...141
 {% endhighlight %}
 
-The idea is then to explore the Telegram API and figure out how the bot communicates with the attacker. The assumption is that it uses a private chat / group with the attacker.
+The idea is then to explore the Telegram API and figure out how the bot communicates with the attacker. The assumption is that it uses a private chat / group with the attacker. [This resource](https://checkmarx.com/blog/how-we-were-able-to-infiltrate-attacker-telegram-bots/) elaborates much more on this topic.
 
 During the CTF there was a lot of activity with this bot, so the `getUpdates` endpoint with Telegram had some information, but the "proper" way was probably to look at the conversation history and retrieve that information. So, let's use the API key informations that we have to use `forwardMessage`, to send data from an old chat to our own account. To do that, we need to find the bot username.
 
@@ -568,7 +568,8 @@ Hidden in plain sight.
 
 ### [10/10] Submit the md5sum of the 2 files in the archive that the attacker exfiltrated.
 
-Here we need to find some of the files that has been shared from the compromised system, and reading up on how files are fetched and renamed with 7z - during the CTF it was simply bruteforcing download of the files from the attackers chat.
+Here we need to find some of the files that has been shared from the compromised system.
+During the CTF the method was simply bruteforcing download of the files from the attackers chat.
 
 {% highlight powershell %}
 1..23 | % { $_; iwr "https://api.telegram.org/file/bot$($i0)/documents/file_$_.7z" -OutFile file_$_.7z }
