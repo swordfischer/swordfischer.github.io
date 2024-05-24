@@ -137,7 +137,7 @@ hsI4L="T";
 "
 {% endhighlight %}
 
-The eval function refers the variable `NS1M5by`, this is what we are looking for to get a bit further. Most of the scripts in these payloads refer to data inside registry, which will be written in code examples as strings. The more "clean" JS scripts are then executed in the Chrome console.
+The `eval` function refers the variable `NS1M5by`, this is what we are looking for to get a bit further. Most of the scripts in these payloads refer to data inside registry, which will be written in code examples as strings. The more "clean" JS scripts are then executed in the Chrome console.
 
 {% highlight js %}
 LQ1K5zw="";
@@ -380,7 +380,7 @@ HKCU:\software\classes\Interface\{a7126d4c-f492-4eb9-8a2a-f673dbdd3334}\TypeLib
 
 ### [7/10] What is the attacker's Telegram username?
 
-As stated earlier, there are some values stored in registry - some of it holds the authentication for the malware to communicate with the Telegram C2.
+As stated in [6/10], there are some values stored in registry - some of it holds the authentication for the malware to communicate with the Telegram C2.
 `$g11` contains the bot id, `$y31` is the authentication key for the bot (`$i0` is the concatenated auth string), `$j51` is the chat id.
 
 {% highlight powershell %}
@@ -392,7 +392,7 @@ AAE...REDACTED...cy4
 
 The idea is then to explore the Telegram API and figure out how the bot communicates with the attacker. The assumption is that it uses a private chat / group with the attacker. [This resource](https://checkmarx.com/blog/how-we-were-able-to-infiltrate-attacker-telegram-bots/) elaborates much more on this topic.
 
-During the CTF there was a lot of activity with this bot, so the `getUpdates` endpoint with Telegram had some information, but the "proper" way was probably to look at the conversation history and retrieve that information. So, let's use the API key informations that we have to use `forwardMessage`, to send data from an old chat to our own account. To do that, we need to find the bot username.
+During the CTF there was a lot of activity with this bot, so the `getUpdates` endpoint with Telegram had some information, but the "proper" way was probably to look at the conversation history and retrieve that information. Based on the API key information that we have, we can use `forwardMessage` to send data from an old chat to our own account. To do that, we need to find the bot username.
 
 {% highlight powershell %}
 (irm -Uri "https://api.telegram.org/bot$($i0)/getMe").Result
@@ -532,7 +532,7 @@ ri -Path $w51 -Force
 
 {% endhighlight %}
 
-From which this segment is the important one `& 'C:\Program Files\7-Zip\7z.exe' a -t7z -mx5 -parameter-none $w51 $l01 $w51s.FullName|Out-Null`
+From the previous lines of code, this is the important one `& 'C:\Program Files\7-Zip\7z.exe' a -t7z -mx5 -parameter-none $w51 $l01 $w51s.FullName|Out-Null`
 
 According to the 7zip documentation, `-p` passes a password with commandline. 
 
@@ -610,6 +610,7 @@ MD5             FFCEDF790CE7FE09E858A7EE51773BCD
 {% endhighlight %}
 
 After the CTF, it was clear that Telegram stores files in the chat as well - so that was another way of getting them.
+
 ![Telegram](/img/htb/challenges/counter-defensive/telegram_5.png)
 
 {% include htb_flag.html id="10" description="Submit the md5sum of the 2 files in the archive that the attacker exfiltrated." flag="83aa3b16ba6a648c133839c8f4af6af9_ffcedf790ce7fe09e858a7ee51773bcd" %}
