@@ -1,0 +1,43 @@
+  <div style="
+  background-color: #1e293b;
+  border: 1px solid #1A2332;
+  color: #8ca2c2;
+  display: block;
+  margin-bottom: 2em;
+  border-radius: 0.5em;
+  display: flex;
+">
+	<div style="
+    background-color: #30498a;
+    text-align: center;
+    padding: 0.25em 0.5em;
+    font-size: 2em;
+    display: inline-block;
+    ">
+		<p style="
+        text-align: center;
+        position: relative;
+        top: 50%;
+        -ms-transform: translateY(-50%);
+        -webkit-transform: translateY(-50%);
+        transform: translateY(-50%)"><img src="/img/cd/blueyard/{{ include.title | downcase }}/logo.webp" height="64"></p>
+	</div>
+	<div style="
+    padding: 0.25em 0.5em;
+    width: 90%;
+    display: inline-block;
+    ">
+		<p style="
+        font-weight: 700;
+        padding: 0 1em;
+        "><a href="https://cyberdefenders.org/blueteam-ctf-challenges/{{ include.title | downcase }}/">{{ include.title }}</a> | {{ include.difficulty }}</p>
+		<div>
+			<p style="
+                width: 90%;
+                color: #8ca2c2;
+                margin: 0 1em 1em 1em;
+                padding: 1em;
+                border: 1px solid #1A2332">{{ include.scenario }}</p>
+		</div>
+	</div>
+</div>
