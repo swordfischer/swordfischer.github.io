@@ -20,7 +20,7 @@
         top: 50%;
         -ms-transform: translateY(-50%);
         -webkit-transform: translateY(-50%);
-        transform: translateY(-50%)"><img src="/img/cd/blueyard/{{ include.title | downcase }}/logo.webp" height="64"></p>
+        transform: translateY(-50%)"><img src="/img/cd/blueyard/{{ include.title | downcase | replace: ' ','' }}/logo.webp" height="64"></p>
 	</div>
 	<div style="
     padding: 0.25em 0.5em;
@@ -30,7 +30,7 @@
 		<p style="
         font-weight: 700;
         padding: 0 1em;
-        "><a href="https://cyberdefenders.org/blueteam-ctf-challenges/{{ include.title | downcase }}/">{{ include.title }}</a> | {{ include.difficulty }}</p>
+        "><a href="https://cyberdefenders.org/blueteam-ctf-challenges/{{ include.title | downcase | replace: ' ','-' }}/">{{ include.title }}</a> | {{ include.difficulty }}</p>
 		<div>
 			<p style="
                 width: 90%;
