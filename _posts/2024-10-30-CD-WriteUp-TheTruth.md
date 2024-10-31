@@ -33,7 +33,7 @@ Let's load up the `data` directory with Autopsy and select the aLEAPP ingest mod
 
 Once the Analyzer is done, we will proceed with viewing the data.
 
-![Autopsy](/img/cd/blueyard/thetruth/autopsy.png)
+![Autopsy](/img/cd/blueyard/thetruth/q0_autopsy.png)
 
 ### Q1. Identify the suspect's friend he claims to have picked up from the airport. What is this friend's name?
 
@@ -52,6 +52,8 @@ It's likely that artifacts such as tickets would be stored as PDFs or images, so
 ![Q2 File View](/img/cd/blueyard/thetruth/q2_fileview.png)
 
 There are no PDFs, but there is afew pictures. If open the images we will find an image called `Plane Ticket.png` where the flight number is shown.
+
+![Q2 Answer](/img/cd/blueyard/thetruth/q2_answer.png)
 
 {% include cd_flag.html id="2" description="To verify the suspect's airport visit, we need to locate the flight ticket. What's the flight number?" flag="B 54321" %}
 
