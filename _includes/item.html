@@ -1,0 +1,10 @@
+<div class="{{ include.type }}-section">
+  <input type="checkbox" {% if include.question %}disabled{% endif %}>
+  {% if include.answer %}
+  <span class="placeholder">{{ include.placeholder | default: "Click flag to reveal" }}</span>
+  <span class="answer">{{ include.answer }}</span>
+  {% endif %}
+  {% if include.question %}
+  <span class="question">{{ include.question }}</span>
+  {% endif %}
+</div>

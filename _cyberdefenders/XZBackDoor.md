@@ -1,30 +1,40 @@
 ---
 layout: post
-title:  "BlueYard - XZBackDoor"
-category: CD
+date: 2024-10-27
+platform: "CD"
+title:  "XZBackDoor"
+difficulty: "Hard"
+scenario: "You are part of the incident response team at a mid-sized financial services company. Recently, your network monitoring systems have flagged unusual SSH traffic patterns emanating from one of your Linux servers. Preliminary analysis suggests potential unauthorized access, which could be compromising the security and integrity of your network."
+question_1: "In the midst of your analysis of the compromised Linux server running XZ Utils, we need to confirm specific system vulnerabilities - could you pinpoint the full path to the backdoored library?"
+question_2: "Investigate the backdoored XZ Utils library found on the compromised system. Can you locate and extract the public key that the threat actor embedded within this file during the compromise?"
+question_3: "The investigation has traced back some entries to a GitHub account - what is the username associated with these activities that introduced the backdoor?"
+question_4: "To build a timeline of the threat actor’s preparation, when was the GitHub account that deployed the backdoor first registered?"
+question_5: "For a deeper dive into the initial breach, could you fetch the URL of the first commit made by the threat actor to the XZ GitHub repository?"
+question_6: "Getting back to our compromised server, we suspect a persistent threat. What is the MITRE-ID of the persistence technique utilized by the attacker in this incident?"
+question_7: "To correlate with our external traffic logs, what was the IP address used by the attacker during the suspected unauthorized access events?"
+question_8: "In order to accurately log and analyze the sequence of unauthorized activities, when was the first command executed by the attacker through the persistence mechanism?"
+question_9: "Understanding the means of unauthorized access is vital - what key did the attacker use to gain entry through the persistence mechanism deployed?"
+question_10: "Part of ensuring full remediation involves understanding the attacker’s fallback strategies - what is the first new file name the threat actor attempted to create as a backup measure to maintain their foothold?"
 ---
-{% include cd_blueyard.html title="XZBackDoor" difficulty="Hard" scenario="You are part of the incident response team at a mid-sized financial services company. Recently, your network monitoring systems have flagged unusual SSH traffic patterns emanating from one of your Linux servers. Preliminary analysis suggests potential unauthorized access, which could be compromising the security and integrity of your network." %}
+{% include scenario.html %}
 
 # Questions
 
-1. [In the midst of your analysis of the compromised Linux server running XZ Utils, we need to confirm specific system vulnerabilities - could you pinpoint the full path to the backdoored library?](#q1-in-the-midst-of-your-analysis-of-the-compromised-linux-server-running-xz-utils-we-need-to-confirm-specific-system-vulnerabilities---could-you-pinpoint-the-full-path-to-the-backdoored-library)
-2. [Investigate the backdoored XZ Utils library found on the compromised system. Can you locate and extract the public key that the threat actor embedded within this file during the compromise?](#q2-investigate-the-backdoored-xz-utils-library-found-on-the-compromised-system-can-you-locate-and-extract-the-public-key-that-the-threat-actor-embedded-within-this-file-during-the-compromise)
-3. [The investigation has traced back some entries to a GitHub account - what is the username associated with these activities that introduced the backdoor?](#q3-the-investigation-has-traced-back-some-entries-to-a-github-account---what-is-the-username-associated-with-these-activities-that-introduced-the-backdoor)
-4. [To build a timeline of the threat actor’s preparation, when was the GitHub account that deployed the backdoor first registered?](#q4-to-build-a-timeline-of-the-threat-actors-preparation-when-was-the-github-account-that-deployed-the-backdoor-first-registered)
-5. [For a deeper dive into the initial breach, could you fetch the URL of the first commit made by the threat actor to the XZ GitHub repository?](#q5-for-a-deeper-dive-into-the-initial-breach-could-you-fetch-the-url-of-the-first-commit-made-by-the-threat-actor-to-the-xz-github-repository)
-6. [Getting back to our compromised server, we suspect a persistent threat. What is the MITRE-ID of the persistence technique utilized by the attacker in this incident?](#q6-getting-back-to-our-compromised-server-we-suspect-a-persistent-threat-what-is-the-mitre-id-of-the-persistence-technique-utilized-by-the-attacker-in-this-incident)
-7. [To correlate with our external traffic logs, what was the IP address used by the attacker during the suspected unauthorized access events?](#q7-to-correlate-with-our-external-traffic-logs-what-was-the-ip-address-used-by-the-attacker-during-the-suspected-unauthorized-access-events)
-8. [In order to accurately log and analyze the sequence of unauthorized activities, when was the first command executed by the attacker through the persistence mechanism?](#q8-in-order-to-accurately-log-and-analyze-the-sequence-of-unauthorized-activities-when-was-the-first-command-executed-by-the-attacker-through-the-persistence-mechanism)
-9. [Understanding the means of unauthorized access is vital - what key did the attacker use to gain entry through the persistence mechanism deployed?](#q9-understanding-the-means-of-unauthorized-access-is-vital---what-key-did-the-attacker-use-to-gain-entry-through-the-persistence-mechanism-deployed)
-10. [Part of ensuring full remediation involves understanding the attacker’s fallback strategies - what is the first new file name the threat actor attempted to create as a backup measure to maintain their foothold?](#q10-part-of-ensuring-full-remediation-involves-understanding-the-attackers-fallback-strategies---what-is-the-first-new-file-name-the-threat-actor-attempted-to-create-as-a-backup-measure-to-maintain-their-foothold)
+1. [{{ page.question_1 }}](#question-1)
+2. [{{ page.question_2 }}](#question-2)
+3. [{{ page.question_3 }}](#question-3)
+4. [{{ page.question_4 }}](#question-4)
+5. [{{ page.question_5 }}](#question-5)
+6. [{{ page.question_6 }}](#question-6)
+7. [{{ page.question_7 }}](#question-7)
+8. [{{ page.question_8 }}](#question-8)
+9. [{{ page.question_9 }}](#question-9)
+10. [{{ page.question_10}}](#question-10)
 
-# Discussion
+# Answering the questions
 
-The scenario revolves around the supply chain attack made on XZ in versions 5.6.0 to 5.6.1. 
-
-# Answering the Tasks
-
-### Q1. In the midst of your analysis of the compromised Linux server running XZ Utils, we need to confirm specific system vulnerabilities - could you pinpoint the full path to the backdoored library?
+## Question 1
+{% include item.html type="question" id="1" question=page.question_1 %}
 
 We are dropped directly into the action in this lab, and once the labs opens - we're "in". Let's start with determining if we could be vulnerable:
 {% highlight terminal %}
@@ -54,20 +64,21 @@ VULN
 
 Now we have confirmed the location of the vulnerable library.
 
-{% include cd_flag.html id="1" description="In the midst of your analysis of the compromised Linux server running XZ Utils, we need to confirm specific system vulnerabilities - could you pinpoint the full path to the backdoored library?" flag="/usr/lib/x86_64-linux-gnu/liblzma.so.5.6.1" %}
+{% include item.html type="answer" id="1" description=page.question_1 answer="/usr/lib/x86_64-linux-gnu/liblzma.so.5.6.1" %}
 
-### Q2. Investigate the backdoored XZ Utils library found on the compromised system. Can you locate and extract the public key that the threat actor embedded within this file during the compromise?
+## Question 2
+{% include item.html type="question" id="2" question=page.question_2 %}
 
 We have turned our attention to the library, and there are multiple approaches we can use in order determine what the public key is. First we need to understand how the key can be inserted into the library - here [XZBot](https://github.com/amlweems/xzbot) is an excellent resource.
 
-#### A. Determining key based on assembly reference
+### A. Determining key based on assembly reference
 I'm not well versed in Assembly, but one thing I do know is that `0x90` is `nop` or `No Operation`, and looking at the XZBot [`patch.py`](https://github.com/amlweems/xzbot/blob/main/patch.py#L43-L45) it has 3 distinct instructions of 0x90, sequentially even! Using the more or less the same approach as before, we can find that part of the patched library, and pull out the following 114 characters (length of the key):
 {% highlight terminal %}
 ubuntu@ip-172-31-33-224:~$ hexdump -ve '1/1 "%.2X"' /usr/lib/x86_64-linux-gnu/liblzma.so.5.6.1  | awk -F '909090' '{print substr($2,0,114)}'
 E52625358384746D50880AD7D99AD8A672E38E529D04EEC5130061B0906D57C5ADE828BCF5883CE6977CF4F5F6B947F7CE388528ADAE165800
 {% endhighlight %}
 
-#### B. Determining key based on XZBot reference file
+### B. Determining key based on XZBot reference file
 The XZBot repository also contains a patched file we can use as reference [here](https://github.com/amlweems/xzbot/blob/main/assets/liblzma.so.5.6.1.patch). If we transfer that to the lab, we can create a hex diff between the two libraries.
 
 {% highlight terminal %}
@@ -86,7 +97,7 @@ ubuntu@ip-172-31-33-224:~$ diff <(xxd /usr/lib/x86_64-linux-gnu/liblzma.so.5.6.1
 
 The first 114 bytes matches the key injected in XZBot on the second file - likewise, the key for the attacker must be placed in the same location in the first file. 
 
-#### C. Determining key based on assembly reference with objdump
+### C. Determining key based on assembly reference with objdump
 A third approach could be finding the code referenced in `patch.py` with `objdump`:
 {% highlight terminal %}
 
@@ -132,32 +143,36 @@ This also gives us the key, just written as assembly instructions, without the l
 
 Pick your poison :)
 
-{% include cd_flag.html id="2" description="Investigate the backdoored XZ Utils library found on the compromised system. Can you locate and extract the public key that the threat actor embedded within this file during the compromise?" flag="e52625358384746d50880ad7d99ad8a672e38e529d04eec5130061b0906d57c5ade828bcf5883ce6977cf4f5f6b947f7ce388528adae165800" %}
+{% include item.html type="answer" id="2" description=page.question_2 answer="e52625358384746d50880ad7d99ad8a672e38e529d04eec5130061b0906d57c5ade828bcf5883ce6977cf4f5f6b947f7ce388528adae165800" %}
 
-### Q3. The investigation has traced back some entries to a GitHub account - what is the username associated with these activities that introduced the backdoor?
+## Question 3
+{% include item.html type="question" id="3" question=page.question_3 %}
 
 Depending on when you read this, there is likely a bunch of articles out there going in depth on this attack, or some of the relevant code may have been removed or taken down.
 
 But to answer the question, we need to trace the commits done to the upstream package on [GitHub](https://github.com/tukaani-project/xz). At the time of writing, the releases are no longer present, but we can utilize the [Tags](https://github.com/tukaani-project/xz/tags) on GitHub. Both v5.6.0 and v5.6.1 was tagged by the same account. Searching for that username on any respectable search engine should clear up any doubts.
 
 
-{% include cd_flag.html id="3" description="The investigation has traced back some entries to a GitHub account - what is the username associated with these activities that introduced the backdoor?" flag="JiaT75" %}
+{% include item.html type="answer" id="3" description=page.question_3 answer="JiaT75" %}
 
-### Q4. To build a timeline of the threat actor’s preparation, when was the GitHub account that deployed the backdoor first registered?
+## Question 4
+{% include item.html type="question" id="4" question=page.question_4 %}
 
 Knowing the username, we can utilize the [GitHub API](https://docs.github.com/en/rest?apiVersion=2022-11-28) to find the creation date of an account.
 
 We need the `created_at` property on from the GitHub API for the [account](https://api.github.com/users/JiaT75)
 
-{% include cd_flag.html id="4" description="To build a timeline of the threat actor’s preparation, when was the GitHub account that deployed the backdoor first registered?" flag="2021-01-26 18:11:07" %}
+{% include item.html type="answer" id="4" description=page.question_4 answer="2021-01-26 18:11:07" %}
 
-### Q5. For a deeper dive into the initial breach, could you fetch the URL of the first commit made by the threat actor to the XZ GitHub repository?
+## Question 5 
+{% include item.html type="question" id="5" question=page.question_5 %}
 
 Using the tags and the username, we can filter our query on the GitHub repository for [all their commits](https://github.com/tukaani-project/xz/commits/v5.6.0?author=JiaT75&after=2d7d862e3ffa8cec4fd3fdffcd84e984a17aa429+419) and go back to the first commit made on the 6th of February 2022.
 
-{% include cd_flag.html id="5" description="For a deeper dive into the initial breach, could you fetch the URL of the first commit made by the threat actor to the XZ GitHub repository?" flag="https://github.com/tukaani-project/xz/commit/6468f7e41a8e9c611e4ba8d34e2175c5dacdbeb4" %}
+{% include item.html type="answer" id="5" description=page.question_5 answer="https://github.com/tukaani-project/xz/commit/6468f7e41a8e9c611e4ba8d34e2175c5dacdbeb4" %}
 
-### Q6. Getting back to our compromised server, we suspect a persistent threat. What is the MITRE-ID of the persistence technique utilized by the attacker in this incident?
+## Question 6
+{% include item.html type="question" id="6" question=page.question_6 %}
 
 We need to determine how the attacker can persist on the endpoint, and the auth.log / journal is a place to start.
 
@@ -240,9 +255,10 @@ The md5sum is for the text `password`, and the hex encoded string is `base64_dec
 
 Mapping this to the MITRE ATT&CK framework, will be `Persistence` > `Server Software Component` > `Web Shell`.
 
-{% include cd_flag.html id="6" description="Getting back to our compromised server, we suspect a persistent threat. What is the MITRE-ID of the persistence technique utilized by the attacker in this incident?" flag="T1505.003" %}
+{% include item.html type="answer" id="6" description=page.question_6 answer="T1505.003" %}
 
-### Q7. To correlate with our external traffic logs, what was the IP address used by the attacker during the suspected unauthorized access events?
+## Question 7
+{% include item.html type="question" id="7" question=page.question_7 %}
 
 As we previously established, we need to look for POSTs to the `index.php` file which can be read in the Apache logs:
 
@@ -274,9 +290,10 @@ oot@ip-172-31-33-224:~# grep POST /var/log/apache2/access.log.1 | grep index
 
 Luckily not many different IPs have POSTed to `index.php`. 
 
-{% include cd_flag.html id="7" description="To correlate with our external traffic logs, what was the IP address used by the attacker during the suspected unauthorized access events?" flag="44.207.251.118" %}
+{% include item.html type="answer" id="7" description=page.question_7 answer="44.207.251.118" %}
 
-### Q8. In order to accurately log and analyze the sequence of unauthorized activities, when was the first command executed by the attacker through the persistence mechanism?
+## Question 8
+{% include item.html type="question" id="8" question=page.question_8 %}
 
 If we check the older POSTs to `index.php`, we can see a rather large object size returned to the client (the value after the HTTP code 200):
 
@@ -291,15 +308,17 @@ root@ip-172-31-33-25:~# grep POST /var/log/apache2/* | grep 44\.207\.251\.118 | 
 
 Most of the objects are similar in size, but one is approximately 30 times as big as the others. We can assume that this was the first command executed.
 
-{% include cd_flag.html id="8" description="In order to accurately log and analyze the sequence of unauthorized activities, when was the first command executed by the attacker through the persistence mechanism?" flag="2024-04-12 08:54:56" %}
+{% include item.html type="answer" id="8" description=page.question_8 answer="2024-04-12 08:54:56" %}
 
-### Q9. Understanding the means of unauthorized access is vital - what key did the attacker use to gain entry through the persistence mechanism deployed?
+## Question 9
+{% include item.html type="question" id="9" question=page.question_9 %}
 
 If we circle back to Q6, the `index.php` contains a check for a `pass` value in `POST` with the value of `696d29e0940a4957748fe3fc9efd22a3`. This can be easily searched online and will give us the answer.
 
-{% include cd_flag.html id="9" description="Understanding the means of unauthorized access is vital - what key did the attacker use to gain entry through the persistence mechanism deployed?" flag="password" %}
+{% include item.html type="answer" id="9" description=page.question_9 answer="password" %}
 
-### Q10. Part of ensuring full remediation involves understanding the attacker’s fallback strategies - what is the first new file name the threat actor attempted to create as a backup measure to maintain their foothold?
+## Question 10
+{% include item.html type="question" id="10" question=page.question_10 %}
 
 If we poke around on the filesystem, we can check multiple files for this activity - but considering the need for a webshell to execute code, it's likely related to activities logged in Apache. 
 
@@ -319,4 +338,4 @@ cp: cannot create regular file 'backup.php': Permission denied
 [Fri Apr 12 09:32:35.503344 2024] [mpm_prefork:notice] [pid 9234] AH00170: caught SIGWINCH, shutting down gracefully
 {% endhighlight %}
 
-{% include cd_flag.html id="10" description="Part of ensuring full remediation involves understanding the attacker’s fallback strategies - what is the first new file name the threat actor attempted to create as a backup measure to maintain their foothold?" flag="index_backup.php" %}
+{% include item.html type="answer" id="10" description=page.question_10 answer="index_backup.php" %}

@@ -1,55 +1,59 @@
 ---
 layout: post
-title:  "Sherlocks - Safecracker"
-category: HTB
+date: 2024-01-22
+platform: "HTB"
+title:  "Safecracker"
+difficulty: "Insane"
+scenario: "We recently hired some contractors to continue the development of our Backup services hosted on a Windows server. We have provided the contractors with accounts for our domain. When our system administrator recently logged on, we found some pretty critical files encrypted and a note left by the attackers. We suspect we have been ransomwared. We want to understand how this attack happened via a full in-depth analysis of any malicious files out of our standard triage. A word of warning, our tooling didn't pick up any of the actions carried out - this could be advanced. Warning This is a warning that this Sherlock includes software that is going to interact with your computer and files. This software has been intentionally included for educational purposes and is NOT intended to be executed or used otherwise. Always handle such files in isolated, controlled, and secure environments. One the Sherlock zip has been unzipped, you will find a DANGER.txt file. Please read this to proceed."
+question_1: "Which user account was utilised for initial access to our company server?"
+question_2: "Which command did the TA utilise to escalate to SYSTEM after the initial compromise?"
+question_3: "How many files have been encrypted by the the ransomware deployment?"
+question_4: "What is the name of the process that the unpacked executable runs as?"
+question_5: "What is the XOR key used for the encrypted strings?"
+question_6: "What encryption was the packer using?"
+question_7: "What was the encryption key and IV for the packer?"
+question_8: "What was the name of the memoryfd the packer used?"
+question_9: "What was the target directory for the ransomware?"
+question_10: "What compression library was used to compress the packed binary?"
+question_11: "The binary appears to check for a debugger, what file does it check to achieve this?"
+question_12: "What exception does the binary raise?"
+question_13: "Out of this list, what extension is not targeted by the malware? `.pptx,.pdf,.tar.gz,.tar,.zip,.exe,.mp4,.mp3`"
+question_14: "What compiler was used to create the malware?"
+question_15: "If the malware detects a debugger, what string is printed to the screen?"
+question_16: "What is the contents of the `.comment` section?"
+question_17: "What file extension does the ransomware rename files to?"
+question_18: "What is the bitcoin address in the ransomware note?"
+question_19: "What string does the binary look for when looking for a debugger?"
+question_20: "It appears that the attacker has bought the malware strain from another hacker, what is their handle?"
+question_21: "What system call is utilised by the binary to list the files within the targeted directories?"
+question_22: "Which system call is used to delete the original files?"
 ---
-{% include htb_sherlock.html title="Safecracker" difficulty="Insane" scenario="We recently hired some contractors to continue the development of our Backup services hosted on a Windows server. We have provided the contractors with accounts for our domain. When our system administrator recently logged on, we found some pretty critical files encrypted and a note left by the attackers. We suspect we have been ransomwared. We want to understand how this attack happened via a full in-depth analysis of any malicious files out of our standard triage. A word of warning, our tooling didn't pick up any of the actions carried out - this could be advanced. Warning This is a warning that this Sherlock includes software that is going to interact with your computer and files. This software has been intentionally included for educational purposes and is NOT intended to be executed or used otherwise. Always handle such files in isolated, controlled, and secure environments. One the Sherlock zip has been unzipped, you will find a DANGER.txt file. Please read this to proceed." %}
+{% include scenario.html %}
 
 # Tasks
 
-1. [Which user account was utilised for initial access to our company server?](#1-which-user-account-was-utilised-for-initial-access-to-our-company-server)
-
-2. [Which command did the TA utilise to escalate to SYSTEM after the initial compromise?](#2-which-command-did-the-ta-utilise-to-escalate-to-system-after-the-initial-compromise)
-
-3. [How many files have been encrypted by the the ransomware deployment?](#3-how-many-files-have-been-encrypted-by-the-the-ransomware-deployment)
-
-4. [What is the name of the process that the unpacked executable runs as?](#4-what-is-the-name-of-the-process-that-the-unpacked-executable-runs-as)
-
-5. [What is the XOR key used for the encrypted strings?](#5-what-is-the-xor-key-used-for-the-encrypted-strings)
-
-6. [What encryption was the packer using?](#6-what-encryption-was-the-packer-using)
-
-7. [What was the encryption key and IV for the packer?](#7-what-was-the-encryption-key-and-iv-for-the-packer)
-
-8. [What was the name of the memoryfd the packer used?](#8-what-was-the-name-of-the-memoryfd-the-packer-used)
-
-9. [What was the target directory for the ransomware?](#9-what-was-the-target-directory-for-the-ransomware)
-
-10. [What compression library was used to compress the packed binary?](#10-what-compression-library-was-used-to-compress-the-packed-binary)
-
-11. [The binary appears to check for a debugger, what file does it check to achieve this?](#11-the-binary-appears-to-check-for-a-debugger-what-file-does-it-check-to-achieve-this)
-
-12. [What exception does the binary raise?](#12-what-exception-does-the-binary-raise)
-
-13. [Out of this list, what extension is not targeted by the malware? `.pptx,.pdf,.tar.gz,.tar,.zip,.exe,.mp4,.mp3`](#13-out-of-this-list-what-extension-is-not-targeted-by-the-malware-pptxpdftargztarzipexemp4mp3)
-
-14. [What compiler was used to create the malware?](#14-what-compiler-was-used-to-create-the-malware)
-
-15. [If the malware detects a debugger, what string is printed to the screen?](#15-if-the-malware-detects-a-debugger-what-string-is-printed-to-the-screen)
-
-16. [What is the contents of the `.comment` section?](#16-what-is-the-contents-of-the-comment-section)
-
-17. [What file extension does the ransomware rename files to?](#17-what-file-extension-does-the-ransomware-rename-files-to)
-
-18. [What is the bitcoin address in the ransomware note?](#18-what-is-the-bitcoin-address-in-the-ransomware-note)
-
-19. [What string does the binary look for when looking for a debugger?](#19-what-string-does-the-binary-look-for-when-looking-for-a-debugger)
-
-20. [It appears that the attacker has bought the malware strain from another hacker, what is their handle?](#20-it-appears-that-the-attacker-has-bought-the-malware-strain-from-another-hacker-what-is-their-handle)
-
-21. [What system call is utilised by the binary to list the files within the targeted directories?](#21-what-system-call-is-utilised-by-the-binary-to-list-the-files-within-the-targeted-directories)
-
-22. [Which system call is used to delete the original files?](#22-which-system-call-is-used-to-delete-the-original-files)
+1. [{{ page.question_1 }}](#question-1)
+2. [{{ page.question_2 }}](#question-2)
+3. [{{ page.question_3 }}](#question-3)
+4. [{{ page.question_4 }}](#question-4)
+5. [{{ page.question_5 }}](#question-5)
+6. [{{ page.question_6 }}](#question-6)
+7. [{{ page.question_7 }}](#question-7)
+8. [{{ page.question_8 }}](#question-8)
+9. [{{ page.question_9 }}](#question-9)
+10. [{{ page.question_10}}](#question-10)
+11. [{{ page.question_11}}](#question-11)
+12. [{{ page.question_12}}](#question-12)
+13. [{{ page.question_13}}](#question-13)
+14. [{{ page.question_14}}](#question-14)
+15. [{{ page.question_15}}](#question-15)
+16. [{{ page.question_16}}](#question-16)
+17. [{{ page.question_17}}](#question-17)
+18. [{{ page.question_18}}](#question-18)
+19. [{{ page.question_19}}](#question-19)
+20. [{{ page.question_20}}](#question-20)
+21. [{{ page.question_21}}](#question-21)
+22. [{{ page.question_22}}](#question-22)
 
 # Discussion
 We have read the scenario, and the tasks we are looking to answer. There are some points of information that we can pull from this, that can assist us in our further analysis.
@@ -72,7 +76,8 @@ I'll also switch between Windows and Linux frequently during Sherlocks - *most* 
 
 Another important thing to note, is that I don't add **all** the steps I did before figuring out the solution. Sometimes a lot of time is spent on goosechases or rabbitholes - I learn from it, but there is not much value for you as a reader to go through that process (or perhaps there is). Nobody wants to see me run `strings` and `grep` a thousand times!
 
-### 1. Which user account was utilised for initial access to our company server?
+## Question 1
+{% include item.html type="question" id="1" question=page.question_1 %}
 
 Let's first check what we have.
 
@@ -124,9 +129,10 @@ We can see from the screenshot, that we have a few old events which we'll assume
 
 Seems obvious that if we read the introduction that it's the contractor was using the aptly named account.
 
-{% include htb_flag.html id="1" description="Which user account was utilised for initial access to our company server?" flag="contractor01" %}
+{% include item.html type="answer" id="1" description=page.question_1 answer="contractor01" %}
 
-### 2. Which command did the TA utilise to escalate to SYSTEM after the initial compromise?
+## Question 2
+{% include item.html type="question" id="2" question=page.question_2 %}
 
 A great place to look for executed commands (if run in PowerShell) is the posh equivalent of `.bash_history`: `ConsoleHost_history.txt`
 {% highlight powershell %}
@@ -149,9 +155,10 @@ Following that, there are some enumeration going on and a `PSTools` folder locat
 
 Then the TA executes psexec to run in SYSTEM context.
 
-{% include htb_flag.html id="2" description="Which command did the TA utilise to escalate to SYSTEM after the initial compromise?" flag=".\PsExec64.exe -s -i cmd.exe" %}
+{% include item.html type="answer" id="2" description=page.question_2 answer=".\PsExec64.exe -s -i cmd.exe" %}
 
-### 3. How many files have been encrypted by the the ransomware deployment?
+## Question 3
+{% include item.html type="question" id="3" question=page.question_3 %}
 
 First we need to figure out which files are encrypted - usually they are renamed with a different extension or is accompanied with a ransom note.
 
@@ -178,9 +185,10 @@ Import-Csv 'Safecracker\20240117210208_MFTECmd_$MFT_Output.csv' | ? { $_.Extensi
 Count    : 33
 {% endhighlight %}
 
-{% include htb_flag.html id="3" description="How many files have been encrypted by the the ransomware deployment?" flag="33" %}
+{% include item.html type="answer" id="3" description=page.question_3 answer="33" %}
 
-### 4. What is the name of the process that the unpacked executable runs as?
+## Question 4
+{% include item.html type="question" id="4" question=page.question_4 %}
 
 Unpacked executable? Now we need to find a *suspicious* binary. Let's check some home directories, perhaps `Downloads`
 
@@ -238,9 +246,10 @@ kali       121187  0.0  0.0  10828  4260 pts/2    R+   22:31   0:00 ps aux
 Now we have a name of an application, and if we search Ghidra for the same, we can see a call for that.
 ![Ghidra PROGRAM](/img/htb/sherlock/safecracker/ghidra_program.png)
 
-{% include htb_flag.html id="4" description="What is the name of the process that the unpacked executable runs as?" flag="PROGRAM" %}
+{% include item.html type="answer" id="4" description=page.question_4 answer="PROGRAM" %}
 
-### 5. What is the XOR key used for the encrypted strings?
+## Question 5
+{% include item.html type="question" id="5" question=page.question_5 %}
 While the application is still running in `gdb`, we can grab some more information from it. As it's being packed it somehow needs to unpacked, which the application takes care of by itself.
 
 We can grab the unpacked binary from `/proc` (the binary uses MemProcFS, so if you run it outside gdb it will get removed once the process is shut down)
@@ -274,17 +283,19 @@ Without fully understanding what is going on here, my assumption is that the fil
 
 If information is XOR'ed, we can XOR it again to "decrypt" the information.
 
-{% include htb_flag.html id="5" description="What is the XOR key used for the encrypted strings?" flag="daV324982S3bh2" %}
+{% include item.html type="answer" id="5" description=page.question_5 answer="daV324982S3bh2" %}
 
-### 6. What encryption was the packer using?
+## Question 6
+{% include item.html type="question" id="6" question=page.question_6 %}
 
 We'll know the length of they key in [#7](#7-what-was-the-encryption-key-and-iv-for-the-packer), which is 64 characters long, or 32 bytes. When we have 32 bytes keys for encryption with that function, it'll be AES-256.
 
 My answer here was a qualified guess, more than a solid answer.
 
-{% include htb_flag.html id="6" description="What encryption was the packer using?" flag="AES-256-CBC" %}
+{% include item.html type="answer" id="6" description=page.question_6 answer="AES-256-CBC" %}
 
-### 7. What was the encryption key and IV for the packer?
+## Question 7
+{% include item.html type="question" id="7" question=page.question_7 %}
 Fiddling about in `Ghidra`, we run into this:
 
 {% highlight c %}
@@ -343,9 +354,10 @@ int FUN_0013a29b(undefined8 param_1,long param_2,undefined4 param_3)
 
 The functions that sets `local_10` and `local_18` from a pointer, is what we are looking for. That information is used in `FUN_0013fc70` which looks an awful lot of a call to decrypt [according to openssl](https://wiki.openssl.org/index.php/EVP_Symmetric_Encryption_and_Decryption#Decrypting_the_Message). So we'll read the `PTR` records, `local_10` is Key and `local_18` is IV.
 
-{% include htb_flag.html id="7" description="What was the encryption key and IV for the packer?" flag="a5f41376d435dc6c61ef9ddf2c4a9543c7d68ec746e690fe391bf1604362742f:95e61ead02c32dab646478048203fd0b" %}
+{% include item.html type="answer" id="7" description=page.question_7 answer="a5f41376d435dc6c61ef9ddf2c4a9543c7d68ec746e690fe391bf1604362742f:95e61ead02c32dab646478048203fd0b" %}
 
-### 8. What was the name of the memoryfd the packer used?
+## Question 8
+{% include item.html type="question" id="8" question=page.question_8 %}
 When we grabbed the binary in [#4](#4-what-is-the-name-of-the-process-that-the-unpacked-executable-runs-as), we could've shown a bit more information - specifically the name of memoryfd. 
 {% highlight shell %}
 ls /proc/121158/exe -la
@@ -354,9 +366,10 @@ lrwxrwxrwx 1 kali kali 0 Jan 18 22:24 /proc/121158/exe -> '/memfd:test (deleted)
 
 Another way to find the systems memfd if we do not know the process id:  `ls -alR /proc/*/exe 2> /dev/null | grep memfd`
 
-{% include htb_flag.html id="8" description="What was the name of the memoryfd the packer used?" flag="test" %}
+{% include item.html type="answer" id="8" description=page.question_8 answer="test" %}
 
-### 9. What was the target directory for the ransomware?
+## Question 9
+{% include item.html type="question" id="9" question=page.question_9 %}
 
 During [#5](#5-what-is-the-xor-key-used-for-the-encrypted-strings) we already saw a very fitting directory if our hypothesis of this malware being run inside WSL is true.
 
@@ -460,15 +473,17 @@ undefined8 FUN_0014ac39(char *param_1,undefined8 param_2)
 
 At least, it calls a `opendir` on the parameter, then gets a list of files - and seems to do so recursively.
 
-{% include htb_flag.html id="9" description="What was the target directory for the ransomware?" flag="/mnt/c/Users" %}
+{% include item.html type="answer" id="9" description=page.question_9 answer="/mnt/c/Users" %}
 
-### 10. What compression library was used to compress the packed binary?
+## Question 10
+{% include item.html type="question" id="10" question=page.question_10 %}
 
 Once again, I'm basing this on pure speculation, there is a some `Z<something>` references and a `1.2.13` reference as well, which returns [this](https://github.com/madler/zlib/releases/tag/v1.2.13) result.
 
-{% include htb_flag.html id="10" description="What compression library was used to compress the packed binary?" flag="zlib" %}
+{% include item.html type="answer" id="10" description=page.question_10 answer="zlib" %}
 
-### 11. The binary appears to check for a debugger, what file does it check to achieve this?
+## Question 11
+{% include item.html type="question" id="11" question=page.question_11 %}
 
 If we follow the function calls in the unpacked binary, we at some point end up in `FUN_0014ad2c` which seems to be the debugger check:
 {% highlight c %}
@@ -508,9 +523,10 @@ int FUN_0014ad2c(void)
 
 According to multiple [sources](https://linuxsecurity.com/features/anti-debugging-for-noobs-part-1) online, it's common to check for debuggers by checking `/proc/self/status` and looking for `TracerPid`
 
-{% include htb_flag.html id="11" description="The binary appears to check for a debugger, what file does it check to achieve this?" flag="/proc/self/status" %}
+{% include item.html type="answer" id="11" description=page.question_11 answer="/proc/self/status" %}
 
-### 12. What exception does the binary raise?
+## Question 12
+{% include item.html type="question" id="12" question=page.question_12 %}
 Just run the binary with a piece of software that sets the TracerPid - it's also visible within Ghidra.
 
 {% highlight shell %}
@@ -520,9 +536,10 @@ ltrace ./exe
 +++ killed by SIGSEGV +++
 {% endhighlight %}
 
-{% include htb_flag.html id="12" description="What exception does the binary raise?" flag="SIGSEGV" %}
+{% include item.html type="answer" id="12" description=page.question_12 answer="SIGSEGV" %}
 
-### 13. Out of this list, what extension is not targeted by the malware  `.pptx,.pdf,.tar.gz,.tar,.zip,.exe,.mp4,.mp3`?
+## Question 13
+{% include item.html type="question" id="13" question=page.question_13 %}
 I'm sure this is readable in the binary if you have some more reversing experience - I don't. However, I'll never shy away from bombing a VM!
 
 {% highlight shell %}
@@ -557,9 +574,10 @@ You can now connect to the Corporate VPN
 Easy to see that one file type was not mentioned here!
 
 
-{% include htb_flag.html id="13" description="Out of this list, what extension is not targeted by the malware? `.pptx,.pdf,.tar.gz,.tar,.zip,.exe,.mp4,.mp3`" flag=".exe" %}
+{% include item.html type="answer" id="13" description=page.question_13 answer=".exe" %}
 
-### 14. What compiler was used to create the malware? 
+## Question 14
+{% include item.html type="question" id="14" question=page.question_14 %}
 For this we can use Detect it Easy, or `strings` and a bit of qualified guesses.
 {% highlight shell %}
 diec MsMpEng.exe 
@@ -569,9 +587,10 @@ ELF64
 
 {% endhighlight %}
 
-{% include htb_flag.html id="14" description="What compiler was used to create the malware?" flag="gcc" %}
+{% include item.html type="answer" id="14" description=page.question_14 answer="gcc" %}
 
-### 15. If the malware detects a debugger, what string is printed to the screen?
+## Question 15
+{% include item.html type="question" id="15" question=page.question_15 %}
 We can `strings` again, or we can debug it:
 {% highlight shell %}
 gdb-peda$ run
@@ -588,9 +607,10 @@ Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
 Program received signal SIGSEGV, Segmentation fault.
 {% endhighlight %}
 
-{% include htb_flag.html id="15" description="If the malware detects a debugger, what string is printed to the screen?" flag="*******DEBUGGED********" %}
+{% include item.html type="answer" id="15" description=page.question_15 answer="*******DEBUGGED********" %}
 
-### 16. What is the contents of the `.comment` section?
+## Question 16
+{% include item.html type="question" id="16" question=page.question_16 %}
 Let's read the binary with `readelf`
 
 {% highlight shell %}
@@ -600,29 +620,33 @@ String dump of section '.comment':
   [     0]  GCC: (Debian 10.2.1-6) 10.2.1 20210110
 {% endhighlight %}
 
-{% include htb_flag.html id="16" description="What is the contents of the `.comment` section?" flag="GCC: (Debian 10.2.1-6) 10.2.1 20210110" %}
+{% include item.html type="answer" id="16" description=page.question_16 answer="GCC: (Debian 10.2.1-6) 10.2.1 20210110" %}
 
-### 17. What file extension does the ransomware rename files to?
+## Question 17
+{% include item.html type="question" id="17" question=page.question_17 %}
 During [#3](#3-how-many-files-have-been-encrypted-by-the-the-ransomware-deployment) we found some `.31337` files which is what the task is refering to.
 
-{% include htb_flag.html id="17" description="What file extension does the ransomware rename files to?" flag=".31337" %}
+{% include item.html type="answer" id="17" description=page.question_17 answer=".31337" %}
 
-### 18. What is the bitcoin address in the ransomware note?
+## Question 18
+{% include item.html type="question" id="18" question=page.question_18 %}
 
 Again, during [#3](#3-how-many-files-have-been-encrypted-by-the-the-ransomware-deployment) we found some `.note` files which is what the task is refering to.
 
 ![ransom note](/img/htb/sherlock/safecracker/ransomnote.png)
 
 
-{% include htb_flag.html id="18" description="What is the bitcoin address in the ransomware note?" flag="16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe" %}
+{% include item.html type="answer" id="18" description=page.question_18 answer="16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe" %}
 
-### 19. What string does the binary look for when looking for a debugger?
+## Question 19
+{% include item.html type="question" id="19" question=page.question_19 %}
 
 We somewhat answered this during [#11](#11-the-binary-appears-to-check-for-a-debugger-what-file-does-it-check-to-achieve-this), the application looks at `/proc/self/status` and for a specific string.
 
-{% include htb_flag.html id="19" description="What string does the binary look for when looking for a debugger?" flag="TracerPid" %}
+{% include item.html type="answer" id="19" description=page.question_19 answer="TracerPid" %}
 
-### 20. It appears that the attacker has bought the malware strain from another hacker, what is their handle?
+## Question 20
+{% include item.html type="question" id="20" question=page.question_20 %}
 If we `binwalk` the file, we get a few references to a users home directory (`strings | grep home` is also sufficient)
 {% highlight shell %}
 binwalk -B exe
@@ -650,9 +674,10 @@ DECIMAL       HEXADECIMAL     DESCRIPTION
 2961184       0x2D2F20        CRC32 polynomial table, big endian
 {% endhighlight %}
 
-{% include htb_flag.html id="20" description="It appears that the attacker has bought the malware strain from another hacker, what is their handle?" flag="blitztide" %}
+{% include item.html type="answer" id="20" description=page.question_20 answer="blitztide" %}
 
-### 21. What system call is utilised by the binary to list the files within the targeted directories?
+## Question 21
+{% include item.html type="question" id="21" question=page.question_21 %}
 
 As we know the application looks for `TracerPid`, what we can do - is patch it in Ghidra and `strace`. Essentially we're going to have it look for the string in another "file". 
 If we patch it to read from `/tmp/tracerpid` instead of `/proc/self/status` - we already know that it looks for a string, `TracerPid` and expects the value to be zero. We can either create a new file with just that, or write the status of cat to tmp, `cat /proc/selv/status > /tmp/tracerpid`.
@@ -690,9 +715,10 @@ write(1, "\t- /mnt/c/Users/Test/2.pdf."..., 37     - /mnt/c/Users/Test/2.pdf.not
 
 I'm assuming that `getdents64` is what we are looking for, at least my brain tells me it means `get diretory entries`. Looking at some [documentation](https://aquasecurity.github.io/tracee/v0.13/docs/events/builtin/syscalls/getdents64/) it seems like `getdents64` does in fact list directories.
 
-{% include htb_flag.html id="21" description="What system call is utilised by the binary to list the files within the targeted directories?" flag="getdents64" %}
+{% include item.html type="answer" id="21" description=page.question_21 answer="getdents64" %}
 
-### 22. Which system call is used to delete the original files?
+## Question 22
+{% include item.html type="question" id="22" question=page.question_22 %}
 If we look a bit further down in our output from `strace` we also see how the application deletes files
 
 {% highlight shell %}
@@ -718,4 +744,4 @@ write(1, "You can now connect to the Corpo"..., 41You can now connect to the Cor
 It does something to the original file, which according to [documentation](https://aquasecurity.github.io/tracee/v0.13/docs/events/builtin/syscalls/unlink/) deletes files.
 
 
-{% include htb_flag.html id="22" description="Which system call is used to delete the original files?" flag="unlink" %}
+{% include item.html type="answer" id="22" description=page.question_22 answer="unlink" %}

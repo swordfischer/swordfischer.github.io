@@ -1,21 +1,33 @@
 ---
 layout: post
-title:  "Sherlocks - OpTinselTrace-2"
-category: HTB
+date: 2023-12-27
+platform: "HTB"
+title:  "OpTinselTrace-2"
+difficulty: "Easy"
+scenario: "It seems our precious technology has been leaked to the threat actor. Our head Elf, PixelPepermint, seems to think that there were some hard-coded sensitive URLs within the technology sent. Please audit our Sparky Cloud logs and confirm if anything was stolen! PS - Santa likes his answers in UTC..."
+question_1: "What is the MD5 sum of the binary the Threat Actor found the S3 bucket location in?"
+question_2: "What time did the Threat Actor begin their automated retrieval of the contents of our exposed S3 bucket?"
+question_3: "What time did the Threat Actor complete their automated retrieval of the contents of our exposed S3 bucket?"
+question_4: "Based on the Threat Actor's user agent - what scripting language did the TA likely utilise to retrieve the files?"
+question_5: "Which file did the Threat Actor locate some hard coded credentials within?"
+question_6: "Please detail all confirmed malicious IP addresses. (Ascending Order)"
+question_7: "We are extremely concerned the TA managed to compromise our private S3 bucket, which contains an important VPN file. Please confirm the name of this VPN file and the time it was retrieved by the TA."
+question_8: "Please confirm the username of the compromised AWS account?"
+question_9: "Based on the analysis completed Santa Claus has asked for some advice. What is the ARN of the S3 Bucket that requires locking down?"
 ---
-{% include htb_sherlock.html title="OpTinselTrace-2" difficulty="Easy" scenario="It seems our precious technology has been leaked to the threat actor. Our head Elf, PixelPepermint, seems to think that there were some hard-coded sensitive URLs within the technology sent. Please audit our Sparky Cloud logs and confirm if anything was stolen! PS - Santa likes his answers in UTC..."  %}
+{% include scenario.html %}
 
 # Tasks
 
-1. [What is the MD5 sum of the binary the Threat Actor found the S3 bucket location in?](#1-what-is-the-md5-sum-of-the-binary-the-threat-actor-found-the-s3-bucket-location-in)
-2. [What time did the Threat Actor begin their automated retrieval of the contents of our exposed S3 bucket?](#2-what-time-did-the-threat-actor-begin-their-automated-retrieval-of-the-contents-of-our-exposed-s3-bucket)
-3. [What time did the Threat Actor complete their automated retrieval of the contents of our exposed S3 bucket?](#3-what-time-did-the-threat-actor-complete-their-automated-retrieval-of-the-contents-of-our-exposed-s3-bucket)
-4. [Based on the Threat Actor's user agent - what scripting language did the TA likely utilise to retrieve the files?](#4-based-on-the-threat-actors-user-agent---what-scripting-language-did-the-ta-likely-utilise-to-retrieve-the-files)
-5. [Which file did the Threat Actor locate some hard coded credentials within?](#5-which-file-did-the-threat-actor-locate-some-hard-coded-credentials-within)
-6. [Please detail all confirmed malicious IP addresses. (Ascending Order)](#6-please-detail-all-confirmed-malicious-ip-addresses-ascending-order)
-7. [We are extremely concerned the TA managed to compromise our private S3 bucket, which contains an important VPN file. Please confirm the name of this VPN file and the time it was retrieved by the TA.](#7-we-are-extremely-concerned-the-ta-managed-to-compromise-our-private-s3-bucket-which-contains-an-important-vpn-file-please-confirm-the-name-of-this-vpn-file-and-the-time-it-was-retrieved-by-the-ta)
-8. [Please confirm the username of the compromised AWS account?](#8-please-confirm-the-username-of-the-compromised-aws-account)
-9. [Based on the analysis completed Santa Claus has asked for some advice. What is the ARN of the S3 Bucket that requires locking down?](#9-based-on-the-analysis-completed-santa-claus-has-asked-for-some-advice-what-is-the-arn-of-the-s3-bucket-that-requires-locking-down)
+1. [{{ page.question_1 }}](#question-1)
+2. [{{ page.question_2 }}](#question-2)
+3. [{{ page.question_3 }}](#question-3)
+4. [{{ page.question_4 }}](#question-4)
+5. [{{ page.question_5 }}](#question-5)
+6. [{{ page.question_6 }}](#question-6)
+7. [{{ page.question_7 }}](#question-7)
+8. [{{ page.question_8 }}](#question-8)
+9. [{{ page.question_9 }}](#question-9)
 
 # Discussion
 We have read the scenario, and the tasks we are looking to answer. There are some points of information that we can pull from this, that can assist us in our further analysis.
@@ -31,7 +43,9 @@ It may not be all the relevant information that we can deduce, but limiting the 
 First, we need to grab the `optinseltrace2.zip` file, and unzip it, it contains a folder called `optinseltrace2-cloudtrail`.
 This is a dump of an Amazon Web Services cloud service, where the majority of the information is stored in json format.
 
-### 1. What is the MD5 sum of the binary the Threat Actor found the S3 bucket location in?
+## Question 1
+{% include item.html type="question" id="1" question=page.question_1 %}
+
 This references the `top-secret` directory we found in OpTinselTrace-1, and the content of the `santa_deliveries.zip` file.
 {% highlight bash %}
 $ unzip santa_deliveries.zip
@@ -48,9 +62,11 @@ https://papa-noel.s3.eu-west-3.amazonaws.com/santa-list.csv
 
 We `strings` the binary, just to confirm there is references for AWS - which there is (there is also a username and a password).
 
-{% include htb_flag.html id="1" description="What is the MD5 sum of the binary the Threat Actor found the S3 bucket location in?" flag="62d5c1f1f9020c98f97d8085b9456b05" %}
+{% include item.html type="answer" id="1" description=page.question_1 answer="62d5c1f1f9020c98f97d8085b9456b05" %}
 
-### 2. What time did the Threat Actor begin their automated retrieval of the contents of our exposed S3 bucket?
+## Question 2
+{% include item.html type="question" id="2" question=page.question_2 %}
+
 Now we need to determine which IP the TA is using, to figure out when they were pulling data from the S3 bucket.
 
 Let's start by figuring out which source IP addresses are present in our cloudtrail logs. The obvious choice here is [jq](https://jqlang.github.io/jq/).
@@ -178,21 +194,24 @@ We notice that they are pulling a git repository, with `python-requests/2.25.1`.
 
 In any case, the first file downloaded is the `description` files in the git repository.
 
-{% include htb_flag.html id="2" description="What time did the Threat Actor begin their automated retrieval of the contents of our exposed S3 bucket?" flag="2023-11-29 08:24:07" %}
+{% include item.html type="answer" id="2" description=page.question_2 answer="2023-11-29 08:24:07" %}
 
-### 3. What time did the Threat Actor complete their automated retrieval of the contents of our exposed S3 bucket?
+## Question 3
+{% include item.html type="question" id="3" question=page.question_3 %}
 
 The last file that was fetched within a short period of time, was `santa-list.csv`. It's fair to assume that this was the full automated scan, and any other data gatherings would be manual.
 
-{% include htb_flag.html id="3" description="What time did the Threat Actor complete their automated retrieval of the contents of our exposed S3 bucket?" flag="2023-11-29 08:24:16" %}
+{% include item.html type="answer" id="3" description=page.question_3 answer="2023-11-29 08:24:16" %}
 
-### 4. Based on the Threat Actor's user agent - what scripting language did the TA likely utilise to retrieve the files?
+## Question 4
+{% include item.html type="question" id="4" question=page.question_4 %}
 
 As we pulled the user agent, we know that the `requests` python library was used.
 
-{% include htb_flag.html id="4" description="Based on the Threat Actor's user agent - what scripting language did the TA likely utilise to retrieve the files?" flag="python" %}
+{% include item.html type="answer" id="4" description=page.question_4 answer="python" %}
 
-### 5. Which file did the Threat Actor locate some hard coded credentials within?
+## Question 5
+{% include item.html type="question" id="5" question=page.question_5 %}
 
 For this we need to check some of the files that was fetched by the TA. If you remember, the `santa_deliveries` binary had a link to `https://papa-noel.s3.eu-west-3.amazonaws.com/santa-list.csv`. I wonder if we can fetch some of the files without authentication. 
 
@@ -249,9 +268,10 @@ index 38938fa..6ee67e3 100644
 
 Now we know, `claus.py` used to have two variables `AWS_SECRET_KEY` and `AWS_ACCESS_KEY` which contained the secrets.
 
-{% include htb_flag.html id="5" description="Which file did the Threat Actor locate some hard coded credentials within?" flag="claus.py" %}
+{% include item.html type="answer" id="5" description=page.question_5 answer="claus.py" %}
 
-### 6. Please detail all confirmed malicious IP addresses. (Ascending Order)
+## Question 6
+{% include item.html type="question" id="6" question=page.question_6 %}
 
 So far, we have found one malicious IP address `191.101.31.57`, then we need to find the second one. If we go back to one our previous queries, and modify it a bit to contain the IPs which pulled data, that is not the first malicious IP.
 
@@ -266,9 +286,10 @@ $ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddr
 
 As mentioned earlier, I found the request to the `north-pole-private` was a bit off, combined with the next question we can assume that a request for the OpenVPN file can be considered malicious, which is done by `45.133.193.41`.
 
-{% include htb_flag.html id="6" description="Please detail all confirmed malicious IP addresses. (Ascending Order)" flag="45.133.193.41, 191.101.31.57" %}
+{% include item.html type="answer" id="6" description=page.question_6 answer="45.133.193.41, 191.101.31.57" %}
 
-### 7. We are extremely concerned the TA managed to compromise our private S3 bucket, which contains an important VPN file. Please confirm the name of this VPN file and the time it was retrieved by the TA.
+## Question 7
+{% include item.html type="question" id="7" question=page.question_7 %}
 
 We kind of already answered this in the previous question, we just failed to print a timestamp. We could also answer this by search for VPN in the `requestParameter.key`.
 
@@ -277,9 +298,11 @@ $ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddr
 "\"2023-11-29T10:16:53Z\",\"45.133.193.41\",\"north-pole-private\",\"GetObject\",\"bytesparkle.ovpn\""
 {% endhighlight %}
 
-{% include htb_flag.html id="7" description="We are extremely concerned the TA managed to compromise our private S3 bucket, which contains an important VPN file. Please confirm the name of this VPN file and the time it was retrieved by the TA." flag="bytesparkle.ovpn, 2023-11-29 10:16:53" %}
+{% include item.html type="answer" id="7" description=page.question_7 answer="bytesparkle.ovpn, 2023-11-29 10:16:53" %}
 
-### 8. Please confirm the username of the compromised AWS account?
+## Question 8
+{% include item.html type="question" id="8" question=page.question_8 %}
+
 We can check the identity property of our output, perhaps for the download of the VPN file.
 
 {% highlight bash %}
@@ -289,9 +312,10 @@ $ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddr
 
 {% endhighlight %}
 
-{% include htb_flag.html id="8" description="Please confirm the username of the compromised AWS account?" flag="elfadmin" %}
+{% include item.html type="answer" id="8" description=page.question_8 answer="elfadmin" %}
 
-### 9. Based on the analysis completed Santa Claus has asked for some advice. What is the ARN of the S3 Bucket that requires locking down?
+## Question 9
+{% include item.html type="question" id="9" question=page.question_9 %}
 
 As we know that the `north-pole-private` bucket was accessed with credentials, those secrets should just be rotated. So the suggestion should be for Santa to lock down the publicly available bucket we grabbed the git repository from.
 
@@ -306,8 +330,4 @@ $ find . -name '*.json' -exec cat {} \; | jq '.Records[] | select( .sourceIPAddr
 
 {% endhighlight %}
 
-{% include htb_flag.html id="9" description="Based on the analysis completed Santa Claus has asked for some advice. What is the ARN of the S3 Bucket that requires locking down?" flag="arn:aws:s3:::papa-noel" %}
-
-## Congratulations
-
-You've have pwned OpTinselTrace-2
+{% include item.html type="answer" id="9" description=page.question_9 answer="arn:aws:s3:::papa-noel" %}

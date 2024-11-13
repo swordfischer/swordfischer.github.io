@@ -1,0 +1,223 @@
+<link rel="icon" type="image/png" href="/img/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<style>
+.answer-section input:not(:checked) + span.placeholder ~ span.answer,
+.answer-section input:checked + span.placeholder
+{
+  display: none;
+}
+
+.answer-section input:checked + span.placeholder ~ span.answer,
+.answer-section input:not(:checked) + span.placeholder {
+  display: inline-block;
+}
+
+.answer-section {
+  font-family: monospace;
+  line-height: 2rem;
+  border: 1px solid #5c88ba;
+}
+
+.question-section {
+  border: 1px solid #ba9552;
+}
+
+.answer-section,
+.question-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  position: relative;
+  min-height: 2rem;
+  overflow-wrap: anywhere;
+  border-radius: 3px;
+  background-color: #323232;
+  margin-bottom: 15px;
+  min-height: 3rem;
+}
+
+.answer-section input,
+.question-section input {
+  width: 5%;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.answer-section span,
+.question-section span {
+  padding: 8px 12px;
+  margin-left: 1rem;
+}
+
+.answer-section span.placeholder {
+  font-style: italic;
+}
+
+.answer-section input::-ms-check {
+  display: none;
+}
+
+.answer-section input:before,
+.answer-section input:after {
+  background-color: #5c88ba;
+}
+
+.question-section input:before,
+.question-section input:after {
+  background-color: #ba9552;
+}
+
+
+
+.answer-section input:before,
+.answer-section input:after,
+.question-section input:before,
+.question-section input:after {
+  font-size: 2rem;
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 5%;
+  height: 100%;
+  color: #121212;
+  background-size: 50% 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+  text-align: center;
+}
+
+.question-section input:before {
+  content: "\2753\FE0E";
+}
+
+.answer-section input:before {
+  content: "\1F3F3\FE0E";
+  z-index: 1;
+  
+}
+
+.answer-section input:checked:after {
+  content: "\2714\FE0E";
+  z-index: 2;
+  
+}
+
+.scenario-card {
+  display:flex;
+  position: relative;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 0;
+  background-color: #1e293b;
+  border-radius: 3px;
+  align-items: center;
+  justify-content: center;
+}
+.scenario-body {
+  display: flex;
+  position: relative;
+  margin: 8px;
+}
+.scenario-image {
+  border-radius: 0.375rem;
+  object-fit: cover;
+  margin-right: 8px;
+}
+.scenario-data {
+  margin-left:10px;
+  margin-right:10px;
+  min-width: 118px;
+  padding-top: 18px;
+}
+.scenario-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+.scenario-difficulty  {
+  background-color: #334155;
+  padding: 2px;
+  border-radius: 10px;
+  text-align: center;
+  margin-top: 18px;
+}
+.scenario-link {
+  display: contents;
+}
+
+.scenario-description {
+  margin: 0 10px;
+  padding: 10px;
+}
+
+.message {
+  padding: 1em 1em 1em 1em;
+  display: flex;
+  align-items: center;
+  column-gap: 2rem;
+  margin: 2em 2em 2em 2em;
+}
+.message-icon-container, .message-text-container {
+  position: relative;
+  top: 50%;
+  display: block;
+}
+
+span.message-icon {
+  font-size: 3em;
+  font-weight: 900;
+  margin: 0 0.5em;
+}
+
+span.message-icon-danger::after {
+  content: '\20E0\FE0E';
+}
+
+span.message-icon-warning::after {
+  content: '\26A0\FE0E';
+}
+
+span.message-icon-info::after {
+  content: '\2139\FE0E'
+}
+
+.message-text {
+  margin: 0;
+}
+
+.message {
+  border-radius: 3px;
+  border: 1px solid;
+  border-left: 6px solid;
+}
+
+.message-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #ce3b4a;
+}
+.message-warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #c4a036;
+}
+
+.message-info {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #36a9bb;
+}
+  
+.very-easy { color: #d867d8}
+.easy { color : #89DDFF}
+.medium { color: #e6c165}
+.hard { color: #f07178}
+.insane { color: #bbaeae}
+
+</style>

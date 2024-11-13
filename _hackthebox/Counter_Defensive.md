@@ -1,9 +1,37 @@
 ---
 layout: post
-title:  "HTB Business 2024 - Counter Defensive"
-category: HTB
+date: 2024-05-22
+platform: "HTB"
+type: "CTF"
+ctf_category: "Forensics"
+title:  "Counter Defensive"
+difficulty: "Hard"
+scenario: "As your crew prepares to infiltrate the vault, a critical discovery is made: an opposing faction has embedded malware within a workstation in your infrastructure, targeting invaluable strategic plans. Your task is to dissect the compromised system, trace the malware's operational blueprint, and uncover the method of these remote attacks. Reveal how the enemy monitors and controls their malicious software. Understanding their tactics is key to securing your plans and ensuring the success of your mission to the vault. To get the flag, spawn the docker instance and answer the questions!"
+question_1: "What time did the victim finish downloading the Black-Myth-Wukong64bit.exe file?"
+question_2: "What is the full malicious command which is run whenever the user logs in?"
+question_3: "Referring to the previous file, 'wct98BG.tmp', what is the first process that starts when the malicious file is opened?"
+question_4: "What is the value of the variable named cRkDgAkkUElXsDMMNfwvB3 that you get after decoding the first payload?"
+question_5: "What algorithm/encryption scheme is used in the final payload?"
+question_6: "What is the full path of the key containing the password to derive the encryption key?"
+question_7: "What is the attacker's Telegram username?"
+question_8: "What day did the attacker's server first send a 'new-connection' message?"
+question_9: "What's the password for the 7z archive?"
+question_10: "Submit the md5sum of the 2 files in the archive that the attacker exfiltrated."
 ---
-{% include htb_ctf.html category="forensics" title="Counter Defensive" difficulty="Hard" scenario="As your crew prepares to infiltrate the vault, a critical discovery is made: an opposing faction has embedded malware within a workstation in your infrastructure, targeting invaluable strategic plans. Your task is to dissect the compromised system, trace the malware's operational blueprint, and uncover the method of these remote attacks. Reveal how the enemy monitors and controls their malicious software. Understanding their tactics is key to securing your plans and ensuring the success of your mission to the vault. To get the flag, spawn the docker instance and answer the questions!" %}
+{% include scenario.html %}
+
+# Tasks
+
+1. [{{ page.question_1 }}](#question-1)
+2. [{{ page.question_2 }}](#question-2)
+3. [{{ page.question_3 }}](#question-3)
+4. [{{ page.question_4 }}](#question-4)
+5. [{{ page.question_5 }}](#question-5)
+6. [{{ page.question_6 }}](#question-6)
+7. [{{ page.question_7 }}](#question-7)
+8. [{{ page.question_8 }}](#question-8)
+9. [{{ page.question_9 }}](#question-9)
+10. [{{ page.question_10}}](#question-10)
 
 # Discussion
 There are some points of information that we can pull from the scenario, that can assist us in our further analysis.
@@ -18,7 +46,9 @@ This write-up was formalized during the CTF, and priorities were not on "the rig
 
 Another important thing to note, is that I don't add **all** the steps I did before figuring out the solution. Sometimes a lot of time is spent on goosechases or rabbitholes - I learn from it, but there is not much value for you as a reader to go through that process (or perhaps there is). Nobody wants to see me run `strings` and `grep` a thousand times!
 
-### [1/10] What time did the victim finish downloading the Black-Myth-Wukong64bit.exe file?
+
+## Question 1
+{% include item.html type="question" id="1" question=page.question_1 %}
 We'll start by opening up the image with FTK Imager. Personally I like to dump the data from the image, instead of mounting the image as a drive - either approach has its pros and cons. Mounting the image may cause issues due to long path names, which for some tools will be reported as corruption.
 
 ![FTK Imager](/img/htb/challenges/counter-defensive/ftk_imager_1.png)
@@ -80,9 +110,10 @@ This is a webkit timestamp, which needs to be converted - this can be done with 
 
 ![Epoch Converter](/img/htb/challenges/counter-defensive/webkit_epoch.png)
 
-{% include htb_flag.html id="1" description="What time did the victim finish downloading the Black-Myth-Wukong64bit.exe file?" flag="1713451126" %}
+{% include item.html type="answer" id="1" description=page.question_1 answer="1713451126" %}
 
-### [2/10] What is the full malicious command which is run whenever the user logs in?
+## Question 2
+{% include item.html type="question" id="2" question=page.question_2 %}
 
 We need to find a malicious command that runs everytime the user logs on, and since the `.ad1`-file only contains the user directory, we can limit our searching to the artifacts which are present within the user directories.
 
@@ -93,9 +124,10 @@ If we then check the `Winlogon` key, we find a suspicious command that is run up
 
 ![Registry Explorer](/img/htb/challenges/counter-defensive/registry_explorer_run_2.png)
 
-{% include htb_flag.html id="2" description="What is the full malicious command which is run whenever the user logs in?" flag="%PWS% -nop -w h \"start \"$env:temp\wct98BG.tmp\"\"" %}
+{% include item.html type="answer" id="2" description=page.question_2 answer="%PWS% -nop -w h \"start \"$env:temp\wct98BG.tmp\"\"" %}
 
-### [3/10] Referring to the previous file, 'wct98BG.tmp', what is the first process that starts when the malicious file is opened?
+## Question 3
+{% include item.html type="question" id="3" question=page.question_3 %}
 
 This one was a super time consuming one for me, as I focused too much on the `.tmp` file itself, rather the context of the file. My assumptions was the `.tmp` was a binary of sorts that would be executed once the user logged on. However that was not the case, looking at it with `Detect it Easy`, the file had quite high entropy, meaning that either it was obfuscated or just random junk data. It was the latter. I spent a significant time trying to see if I could OSINT the `Black-Myth-Wukong64bit.exe` binary, so it could be executed and investigated dynamically. I also looked at all artifacts that I could think of which was available, that would contain the process that was executed. 
 
@@ -112,9 +144,10 @@ At first glance, `AppXoiy6rzzu62tdihr9rgvofad4hz7tpf4m` looks like an AppX name,
 
 Bingo, some obfuscated code. This was what we were looking for.
 
-{% include htb_flag.html id="4" description="Referring to the previous file, 'wct98BG.tmp', what is the first process that starts when the malicious file is opened?" flag="mshta.exe" %}
+{% include item.html type="answer" id="4" description=page.question_4 answer="mshta.exe" %}
 
-### [4/10] What is the value of the variable named cRkDgAkkUElXsDMMNfwvB3 that you get after decoding the first payload?
+## Question 4
+{% include item.html type="question" id="4" question=page.question_4 %}
 
 Copying out the payload from registry, and adding some newlines leaves us with:
 
@@ -198,9 +231,10 @@ W05PzuKnofjNtIxYgKN="yaM1OoY576346cqEBmJSKvZwuZGHuXQaK7JY2Ullt5eOrE";
 HhxvXLzOLLi0mIBmJ8Dk="notepad.exe";
 {% endhighlight %}
 
-{% include htb_flag.html id="4" description="What is the value of the variable named cRkDgAkkUElXsDMMNfwvB3 that you get after decoding the first payload?" flag="CbO8GOb9qJiK3txOD4I31x553g" %}
+{% include item.html type="answer" id="4" description=page.question_4 answer="CbO8GOb9qJiK3txOD4I31x553g" %}
 
-### [5/10] What algorithm/encryption scheme is used in the final payload?
+## Question 5
+{% include item.html type="question" id="5" question=page.question_5 %}
 
 We continue down the road of deobfuscation, and remove some of the unused variables - and cleaning it up again (and again, replacing variables that reads from registry, with the values).
 
@@ -304,9 +338,10 @@ $u8+=$r1}}}Set-ItemProperty ((("{0}{3}{1}{2}{4}" -f'HKCU:vQF','FEnvir','onme','v
 
 What we are looking for here it this line of code `$h5=New-Object Security.Cryptography.AesManaged;`
 
-{% include htb_flag.html id="5" description="What algorithm/encryption scheme is used in the final payload?" flag="AES" %}
+{% include item.html type="answer" id="5" description=page.question_5 answer="AES" %}
 
-### [6/10] What is the full path of the key containing the password to derive the encryption key?
+## Question 6
+{% include item.html type="question" id="6" question=page.question_6 %}
 If not evident immediately from the output of the previous PowerShell, the malware uses the users `ENVIRONMENT` variable to store information: `bid`, `hid`, `tid`, `GUID` and `Update`.
 
 ![Registry Explorer](/img/htb/challenges/counter-defensive/registry_explorer_run_5.png)
@@ -376,9 +411,10 @@ HKCU:\software\classes\Interface\{a7126d4c-f492-4eb9-8a2a-f673dbdd3334}\TypeLib
 
 {% endhighlight %}
 
-{% include htb_flag.html id="6" description="What is the full path of the key containing the password to derive the encryption key?" flag="HKEY_CURRENT_USER\software\classes\Interface\{a7126d4c-f492-4eb9-8a2a-f673dbdd3334}\TypeLib" %}
+{% include item.html type="answer" id="6" description=page.question_6 answer="HKEY_CURRENT_USER\software\classes\Interface\{a7126d4c-f492-4eb9-8a2a-f673dbdd3334}\TypeLib" %}
 
-### [7/10] What is the attacker's Telegram username?
+## Question 7
+{% include item.html type="question" id="7" question=page.question_7 %}
 
 As stated in [6/10], there are some values stored in registry - some of it holds the authentication for the malware to communicate with the Telegram C2.
 `$g11` contains the bot id, `$y31` is the authentication key for the bot (`$i0` is the concatenated auth string), `$j51` is the chat id.
@@ -422,17 +458,19 @@ Then we should see messages starting to pop in, in our chat with the bot:
 
 ![Telegram](/img/htb/challenges/counter-defensive/telegram_2.png)
 
-{% include htb_flag.html id="7" description=" What is the attacker's Telegram username?" flag="Pirate_D_Mylan" %}
+{% include item.html type="answer" id="7" description=page.question_7 answer="Pirate_D_Mylan" %}
 
-### [8/10] What day did the attacker's server first send a 'new-connection' message?
+## Question 8
+{% include item.html type="question" id="8" question=page.question_8 %}
 
 Basically, the assumption was on the day that matches all other timestamps during forensics, so on the 18th. But we can validate the question against the original timestamp of the message:
 
 ![Telegram](/img/htb/challenges/counter-defensive/telegram_3.png)
 
-{% include htb_flag.html id="8" description="What day did the attacker's server first send a 'new-connection' message?" flag="18/04/2024" %}
+{% include item.html type="answer" id="8" description=page.question_8 answer="18/04/2024" %}
 
-### [9/10] What's the password for the 7z archive?
+## Question 9
+{% include item.html type="question" id="9" question=page.question_9 %}
 
 I loved this one, because it is so obvious that it's easy to overlook. The first assumptions would be some execution artifacts on the `ad1` dump, but since we're in Telegram mode, let's have a look there:
 
@@ -564,9 +602,10 @@ Usage: 7z <command> [<switches>...] <archive_name> [<file_names>...] [@listfile]
 
 Hidden in plain sight.
 
-{% include htb_flag.html id="9" description="What's the password for the 7z archive?" flag="arameter-none" %}
+{% include item.html type="answer" id="9" description=page.question_9 answer="arameter-none" %}
 
-### [10/10] Submit the md5sum of the 2 files in the archive that the attacker exfiltrated.
+## Question 10
+{% include item.html type="question" id="10" question=page.question_10 %}
 
 Here we need to find some of the files that has been shared from the compromised system.
 During the CTF the method was simply bruteforcing download of the files from the attackers chat.
@@ -613,4 +652,4 @@ After the CTF, it was clear that Telegram stores files in the chat as well - so 
 
 ![Telegram](/img/htb/challenges/counter-defensive/telegram_5.png)
 
-{% include htb_flag.html id="10" description="Submit the md5sum of the 2 files in the archive that the attacker exfiltrated." flag="83aa3b16ba6a648c133839c8f4af6af9_ffcedf790ce7fe09e858a7ee51773bcd" %}
+{% include item.html type="answer" id="10" description=page.question_10 answer="83aa3b16ba6a648c133839c8f4af6af9_ffcedf790ce7fe09e858a7ee51773bcd" %}

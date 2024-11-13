@@ -1,0 +1,12 @@
+<div class="message message-{{ include.type }}">
+  <div class="message-icon-container">
+    {% if include.type %}
+    <span class="message-icon message-icon-{{ include.type }}"></span>
+    {% elsif include.image %}
+    <img src="{{ include.image }}" />
+    {% endif %}
+  </div>
+  <div class="message-text-container">
+    <p class="message-text">{{ include.content }}</p>
+  </div>
+</div>

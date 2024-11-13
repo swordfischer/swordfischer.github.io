@@ -1,23 +1,35 @@
 ---
 layout: post
-title:  "Sherlocks - OpTinselTrace-5"
-category: HTB
+date: 2023-12-28
+platform: "HTB"
+title:  "OpTinselTrace-5"
+difficulty: "Hard"
+scenario: "You'll notice a lot of our critical server infrastructure was recently transferred from the domain of our MSSP - Forela.local over to Northpole.local. We actually managed to purchase some second hand servers from the MSSP who have confirmed they are as secure as Christmas is! It seems not as we believe christmas is doomed and the attackers seemed to have the stealth of a clattering sleigh bell, or they didn’t want to hide at all!!!!!! We have found nasty notes from the Grinch on all of our TinkerTech workstations and servers! Christmas seems doomed. Please help us recover from whoever committed this naughty attack!"
+question_1: "Which CVE did the Threat Actor (TA) initially exploit to gain access to DC01?"
+question_2: "What time did the TA initially exploit the CVE? (UTC)"
+question_3: "What is the name of the executable related to the unusual service installed on the system around the time of the CVE exploitation?"
+question_4: "What date & time was the unusual service start?"
+question_5: "What was the TA's IP address within our internal network?"
+question_6: "Please list all user accounts the TA utilised during their access. (Ascending order)"
+question_7: "What was the name of the scheduled task created by the TA?"
+question_8: "Santa's memory is a little bad recently! He tends to write a lot of stuff down, but all our critical files have been encrypted! Which creature is Santa's new sleigh design planning to use?"
+question_9: "Please confirm the process ID of the process that encrypted our files."
 ---
-{% include htb_sherlock.html title="OpTinselTrace-5" difficulty="Hard" scenario="You'll notice a lot of our critical server infrastructure was recently transferred from the domain of our MSSP - Forela.local over to Northpole.local. We actually managed to purchase some second hand servers from the MSSP who have confirmed they are as secure as Christmas is! It seems not as we believe christmas is doomed and the attackers seemed to have the stealth of a clattering sleigh bell, or they didn’t want to hide at all!!!!!! We have found nasty notes from the Grinch on all of our TinkerTech workstations and servers! Christmas seems doomed. Please help us recover from whoever committed this naughty attack!" %}
+{% include scenario.html %}
 
-{% include danger.html content="<p>THIS SHERLOCK CONTAINS MALWARE.</p><p>CONSIDER YOUR ACTIONS.</p>" %}
+{% include message.html type="danger" content="This sherlock contains malware, consider your actions" %}
 
 # Tasks
 
-1. [Which CVE did the Threat Actor (TA) initially exploit to gain access to DC01?](#1-which-cve-did-the-threat-actor-ta-initially-exploit-to-gain-access-to-dc01)
-2. [What time did the TA initially exploit the CVE? (UTC)](#2-what-time-did-the-ta-initially-exploit-the-cve-utc)
-3. [What is the name of the executable related to the unusual service installed on the system around the time of the CVE exploitation?](#3-what-is-the-name-of-the-executable-related-to-the-unusual-service-installed-on-the-system-around-the-time-of-the-cve-exploitation)
-4. [What date & time was the unusual service start?](#4-what-date--time-was-the-unusual-service-start)
-5. [What was the TA's IP address within our internal network?](#5-what-was-the-tas-ip-address-within-our-internal-network)
-6. [Please list all user accounts the TA utilised during their access. (Ascending order)](#6-please-list-all-user-accounts-the-ta-utilised-during-their-access-ascending-order)
-7. [What was the name of the scheduled task created by the TA?](#7-what-was-the-name-of-the-scheduled-task-created-by-the-ta)
-8. [Santa's memory is a little bad recently! He tends to write a lot of stuff down, but all our critical files have been encrypted! Which creature is Santa's new sleigh design planning to use?](#8-santas-memory-is-a-little-bad-recently-he-tends-to-write-a-lot-of-stuff-down-but-all-our-critical-files-have-been-encrypted-which-creature-is-santas-new-sleigh-design-planning-to-use)
-9. [Please confirm the process ID of the process that encrypted our files.](#9-please-confirm-the-process-id-of-the-process-that-encrypted-our-files)
+1. [{{ page.question_1 }}](#question-1)
+2. [{{ page.question_2 }}](#question-2)
+3. [{{ page.question_3 }}](#question-3)
+4. [{{ page.question_4 }}](#question-4)
+5. [{{ page.question_5 }}](#question-5)
+6. [{{ page.question_6 }}](#question-6)
+7. [{{ page.question_7 }}](#question-7)
+8. [{{ page.question_8 }}](#question-8)
+9. [{{ page.question_9 }}](#question-9)
 
 # Discussion
 We have read the scenario, and the tasks we are looking to answer. There are some points of information that we can pull from this, that can assist us in our further analysis.
@@ -74,7 +86,8 @@ Once we're done scanning, Hayabusa will present us with some summaries.
 
 First thing to note here is that we have a lot of critical detections on the `2023-12-13`, then `Active Directory Replication from Non Machine Account` and `Mimikatz DC Sync`.
 
-### 1. Which CVE did the Threat Actor (TA) initially exploit to gain access to DC01?
+## Question 1
+{% include item.html type="question" id="1" question=page.question_1 %}
 
 When we open up Timeline Explorer with our Hayabusa output, we can filter it a bit more based on the previous information - let's look at the `2023-12-13` events.
 
@@ -84,23 +97,26 @@ Something that caught my eye, is that there is a Logon event for the DC, but com
 
 By now, I already have an inkling of what kind of attack we're seeing - but a few lines higher we get a confirmation as `Svc: vulnerable_to_zerologon` states the obvious. The attacker is using a privilege escalation vulnerability in Netlogon called Zerologon, which has the CVE we will use as our answer.
 
-{% include htb_flag.html id="1" description="Which CVE did the Threat Actor (TA) initially exploit to gain access to DC01?" flag="CVE-2020-1472" %}
+{% include item.html type="answer" id="1" description=page.question_1 answer="CVE-2020-1472" %}
 
-### 2. What time did the TA initially exploit the CVE? (UTC)
+## Question 2
+{% include item.html type="question" id="2" question=page.question_2 %}
 
 We're still looking at the same sequence of events, and it shows the timestamp for which the exploit occured.
 
 ![Timeline Explorer](/img/htb/sherlock/optinseltrace-5/timeline_zerologon.png)
 
-{% include htb_flag.html id="2" description="What time did the TA initially exploit the CVE? (UTC)" flag="2023-12-13 09:24:23" %}
+{% include item.html type="answer" id="2" description=page.question_2 answer="2023-12-13 09:24:23" %}
 
-### 3. What is the name of the executable related to the unusual service installed on the system around the time of the CVE exploitation?
+## Question 3
+{% include item.html type="question" id="3" question=page.question_3 %}
 
 The installation of a service called `vulnerable_to_zerologon` shows the path to the executable, which is our answer.
 
-{% include htb_flag.html id="3" description="What is the name of the executable related to the unusual service installed on the system around the time of the CVE exploitation?" flag="hAvbdksT.exe" %}
+{% include item.html type="answer" id="3" description=page.question_3 answer="hAvbdksT.exe" %}
 
-### 4. What date & time was the unusual service start?
+## Question 4
+{% include item.html type="question" id="4" question=page.question_4 %}
 
 Hayabusa did not collection this information, but luckily we can read the events with PowerShell (or the event viewer). I find PowerShell to be much easier to filter with, than the event viewer.
 
@@ -130,23 +146,26 @@ UTC Time
 12/13/2023 9:24:24 AM
 {% endhighlight %}
 
-{% include htb_flag.html id="4" description="What date & time was the unusual service start?" flag="2023-12-13 09:24:24" %}
+{% include item.html type="answer" id="4" description=page.question_4 answer="2023-12-13 09:24:24" %}
 
-### 5. What was the TA's IP address within our internal network?
+## Question 5
+{% include item.html type="question" id="5" question=page.question_5 %}
 
 We previously established that a non-local IP address was used for attacking the Domain Controller. If we filter on that IP, we see more events showing a sucessful compromise. 
 
 ![Timeline Explorer](/img/htb/sherlock/optinseltrace-5/timeline_ip.png)
 
-{% include htb_flag.html id="5" description="What was the TA's IP address within our internal network?" flag="192.168.68.200" %}
+{% include item.html type="answer" id="5" description=page.question_5 answer="192.168.68.200" %}
 
-### 6. Please list all user accounts the TA utilised during their access. (Ascending order)
+## Question 6
+{% include item.html type="question" id="6" question=page.question_6 %}
 
 The previous screenshot also shows which accounts that was used to access the Domain Controller from that IP.
 
-{% include htb_flag.html id="6" description="Please list all user accounts the TA utilised during their access. (Ascending order)" flag="Administrator, Bytesparkle" %}
+{% include item.html type="answer" id="6" description=page.question_6 answer="Administrator, Bytesparkle" %}
 
-### 7. What was the name of the scheduled task created by the TA?
+## Question 7
+{% include item.html type="question" id="7" question=page.question_7 %}
 
 There is a very suspicious task creation: 
 
@@ -155,9 +174,10 @@ There is a very suspicious task creation:
 
 The task name includes the path, but we're only looking for the task name. We can also find evidence of this task in the KAPE files `DC01.northpole.local-KAPE\uploads\auto\C%3A\Windows\System32\Tasks\Microsoft\svc_vnc`.
 
-{% include htb_flag.html id="7" description="What was the name of the scheduled task created by the TA?" flag="svc_vnc" %}
+{% include item.html type="answer" id="7" description=page.question_7 answer="svc_vnc" %}
 
-### 8. Santa's memory is a little bad recently! He tends to write a lot of stuff down, but all our critical files have been encrypted! Which creature is Santa's new sleigh design planning to use?
+## Question 8
+{% include item.html type="question" id="8" question=page.question_8 %}
 
 Seems like we need to do some reversing on the `splunk_svc.dll` file that was collected for us.
 
@@ -296,7 +316,7 @@ ___
 
 But, I did not choose the best path. I simply executed the malware and had it re-XOR the original files, not the best way to do dynamic analysis.
 
-{% include danger.html content="<p>A word of warning, and I cannot stress this enough - when executing malware you are doing so at your own risk. Malware can break out of the container. It can have unforseen consequences.<br />I'm doing these Sherlocks on a device solely for the purpose of accessing CTFs / HTB and so forth - on which I have VMs that I can restore to before I execute malware. The device is not connected to my internal network. I've done what I can to safeguard myself and limit the impact of a potential threat, and so should you.</p>" %}
+{% include message.html type="danger" content="A word of warning, and I cannot stress this enough - when executing malware you are doing so at your own risk. Malware can break out of the container. It can have unforseen consequences.<br />I'm doing these Sherlocks on a device solely for the purpose of accessing CTFs / HTB and so forth - on which I have VMs that I can restore to before I execute malware. The device is not connected to my internal network. I've done what I can to safeguard myself and limit the impact of a potential threat, and so should you." %}
 
 Let's copy over the `splunk_svc.dll` file to our [FlareVM](https://github.com/mandiant/flare-vm), so we can use it to decrypt our files.
 
@@ -322,9 +342,10 @@ We placed our files in the directory, ran the `.dll` and now we have files with 
 
 Seems like our method worked - there is a PDF that describes the usage of "Enchanted Unicorns", but the answer is looking for the animal in singular form.
 
-{% include htb_flag.html id="8" description="Santa's memory is a little bad recently! He tends to write a lot of stuff down, but all our critical files have been encrypted! Which creature is Santa's new sleigh design planning to use?" flag="Unicorn" %}
+{% include item.html type="answer" id="8" description=page.question_8 answer="Unicorn" %}
 
-### 9. Please confirm the process ID of the process that encrypted our files.
+## Question 9
+{% include item.html type="question" id="9" question=page.question_9 %}
 
 This is a bit more complicated, as we need to figure out *when* the files were encrypted and *how* they got encrypted. Our trusty `$MFT` file may contains some information. 
 
@@ -408,8 +429,4 @@ Properties           : {System.Diagnostics.Eventing.Reader.EventProperty, System
 
 This shows us a `ProcessId` which is exactly what we are looking for.
 
-{% include htb_flag.html id="9" description="Please confirm the process ID of the process that encrypted our files." flag="5828" %}
-
-## Congratulations
-
-You've have pwned OpTinselTrace-5
+{% include item.html type="answer" id="9" description=page.question_9 answer="5828" %}

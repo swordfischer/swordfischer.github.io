@@ -1,0 +1,26 @@
+<div class="scenario-card">
+  <div class="scenario-body">
+    <div class="scenario-data">
+      {% if page.platform == "CD" %}
+      <a class="scenario-link" href="https://cyberdefenders.org/blueteam-ctf-challenges/{{ page.title | downcase | replace: ' ','-' }}/">
+        <img class="scenario-image" src="/img/cd/blueyard/{{ page.title | downcase | replace: ' ','' }}/logo.webp" height="72px" width="118px">
+      </a>
+      {% endif %}
+      {% if page.platform == "HTB" %}
+        {% if page.type == "CTF" %}
+        <img class="htb-image" src="/img/htb/challenges/{{ page.ctf_category | downcase }}.svg" height="118px" width="118px">
+        {% else %}
+      <a class="htb-link" href="https://app.hackthebox.com/sherlocks/{{ page.title | downcase | replace: ' ','-' }}/">
+        <img class="htb-image" src="/img/htb/sherlock/{{ page.title | downcase | replace: ' ','' }}/logo.png" height="118px" width="118px">
+      </a>
+        {% endif %}
+      {% endif %}
+      <div class="scenario-difficulty {{ page.difficulty | downcase }}">
+        {{ page.difficulty }}
+      </div>
+    </div>
+    <div class="scenario-description">
+      {{ page.scenario }}
+    </div>
+  </div>
+</div>
