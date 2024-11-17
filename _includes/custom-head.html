@@ -24,7 +24,8 @@
 }
 
 .answer-section,
-.question-section {
+.question-section,
+.vt-section {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -38,6 +39,11 @@
   min-height: 3rem;
 }
 
+.vt-section {
+  align-items: center;
+  justify-content: center;
+}
+
 .answer-section input,
 .question-section input {
   width: 5%;
@@ -47,6 +53,82 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+}
+
+.vt-score {
+  margin: 10px 30px 10px 10px;
+}
+.vt-md5-value::before { 
+  content:"MD5: ";
+}
+.vt-sha1-value::before {
+  content:"SHA1: ";
+}
+.vt-sha256-value::before {
+  content:"SHA256: ";
+}
+
+.vt-hashes p {
+  margin: 0;
+}
+
+.vt-md5-value::before,
+.vt-sha1-value::before,
+.vt-sha256-value::before {
+  font-weight: bold;
+}
+
+.vt-score-value {
+  --size: 100px;
+  --half-size: calc(var(--size) / 2);
+  --stroke-width: 10px;
+  --radius: calc((var(--size) - var(--stroke-width)) / 2);
+  --circumference: calc(var(--radius) * pi * 2);
+  --dash: calc((var(--progress) * var(--circumference)) / 100);
+}
+
+.vt-score-value circle {
+  cx: var(--half-size);
+  cy: var(--half-size);
+  r: var(--radius);
+  stroke-width: var(--stroke-width);
+  fill: none;
+  stroke-linecap: round;
+}
+.vt-score-value text {
+  fill: #ddd;
+  font-weight: bold
+}
+
+.vt-score-value circle.bg {
+  stroke: #ddd;
+}
+
+.vt-score-value circle.fg {
+  transform: rotate(-90deg);
+  transform-origin: var(--half-size) var(--half-size);
+  stroke-dasharray: var(--dash) calc(var(--circumference) - var(--dash));
+  transition: stroke-dasharray 0.3s linear 0s;
+}
+
+.vt-score-critical circle.fg {
+  stroke: #c01d22;
+}
+.vt-score-high circle.fg {
+  stroke: #ef8032;
+}
+.vt-score-medium circle.fg {
+  stroke: #f6c443;
+}
+.vt-score-low circle.fg {
+  stroke: #42ad5f;
+}
+.vt-score-none circle.fg {
+  stroke: #abb9be;
+}
+
+.vt-logo {
+  margin: 1em;
 }
 
 .answer-section span,
